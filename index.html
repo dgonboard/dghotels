@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comfort Inn & Suites Bradford – New Employee Onboarding</title>
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f4f4;color:#222;min-height:100vh}
+
+/* ===== COLOUR TOKENS ===== */
+:root{
+  --ci-orange:#F7941D;
+  --ci-gold:#FFC72C;
+  --ci-navy:#2D3280;
+  --dg-green:#2D3280;
+  --dg-green-light:#eaebf7;
+  --white:#ffffff;
+  --light-bg:#fafafa;
+  --border:#ddd;
+  --text-dark:#1a1a1a;
+  --text-mid:#444;
+  --text-light:#666;
+  --danger:#c0392b;
+  --success:#27ae60;
+  --shadow:0 2px 12px rgba(0,0,0,.10);
+}
+
+/* ===== HEADER ===== */
+.header{
+  background:linear-gradient(135deg,var(--ci-navy) 0%,#1a1f5c 100%);
+  padding:0;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+}
+.header-inner{
+  max-width:900px;margin:0 auto;
+  display:flex;align-items:center;gap:16px;
+  padding:12px 20px;
+}
+.logo-block{display:flex;align-items:center;gap:14px}
+.logo-dg{
+  width:60px;height:60px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--ci-orange),var(--ci-gold));
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:Georgia,serif;font-size:22px;font-weight:700;
+  color:#fff;letter-spacing:-1px;line-height:1;
+  flex-direction:column;
+}
+.logo-dg span.sub{font-size:7px;font-weight:600;letter-spacing:2px;color:#fff;text-transform:uppercase;margin-top:2px}
+.header-title{color:var(--white)}
+.header-title h1{font-size:1.25rem;font-weight:700;letter-spacing:.3px}
+.header-title p{font-size:.78rem;opacity:.8;margin-top:2px}
+.header-ci{margin-left:auto;display:flex;align-items:center;gap:8px}
+.ci-badge{
+  background:linear-gradient(135deg,var(--ci-orange),var(--ci-gold));
+  border-radius:6px;padding:5px 11px;
+  font-size:.72rem;font-weight:700;color:var(--white);
+  letter-spacing:.5px;text-align:center;line-height:1.3;
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress-wrap{background:#eaebf7;border-bottom:2px solid var(--ci-navy);padding:10px 20px}
+.progress-inner{max-width:900px;margin:0 auto;display:flex;gap:0}
+.step-pill{
+  flex:1;text-align:center;font-size:.72rem;font-weight:600;
+  padding:7px 4px;border-radius:20px;cursor:default;
+  color:var(--text-light);transition:all .2s;position:relative;
+}
+.step-pill.active{background:var(--ci-orange);color:#fff;box-shadow:0 2px 6px rgba(247,148,29,.4)}
+.step-pill.done{background:var(--ci-navy);color:#fff}
+.step-pill:not(:last-child)::after{
+  content:'';position:absolute;right:-6px;top:50%;transform:translateY(-50%);
+  width:12px;height:2px;background:var(--border);z-index:1;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.main{max-width:900px;margin:24px auto;padding:0 16px 60px}
+
+/* ===== STEP PANELS ===== */
+.step-panel{display:none}
+.step-panel.active{display:block}
+
+/* ===== CARD ===== */
+.card{background:var(--white);border-radius:12px;box-shadow:var(--shadow);padding:24px;margin-bottom:20px}
+.card-title{
+  font-size:1.05rem;font-weight:700;color:var(--dg-green);
+  border-bottom:2px solid var(--dg-green-light);
+  padding-bottom:10px;margin-bottom:18px;display:flex;align-items:center;gap:8px;
+}
+.card-title .icon{font-size:1.2rem}
+
+/* ===== FORM ELEMENTS ===== */
+.form-row{display:grid;gap:14px;margin-bottom:14px}
+.form-row.cols-2{grid-template-columns:1fr 1fr}
+.form-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+.form-row.cols-1{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:.82rem;font-weight:600;color:var(--text-mid)}
+.form-group input,.form-group select,.form-group textarea{
+  font-size:16px;padding:10px 12px;
+  border:1.5px solid var(--border);border-radius:8px;
+  outline:none;transition:border-color .15s;
+  background:var(--white);color:var(--text-dark);
+  width:100%;min-height:48px;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  border-color:var(--ci-orange);box-shadow:0 0 0 3px rgba(247,148,29,.15);
+}
+.form-group .hint{font-size:.73rem;color:var(--text-light);margin-top:2px}
+.sin-wrap{position:relative}
+.sin-wrap input{padding-right:48px}
+.sin-toggle{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--text-light);
+  padding:4px;min-height:0;
+}
+.checkbox-row{display:flex;align-items:center;gap:10px;padding:10px 0}
+.checkbox-row input[type=checkbox]{width:20px;height:20px;accent-color:var(--ci-orange);flex-shrink:0;cursor:pointer}
+.checkbox-row label{font-size:.9rem;color:var(--text-dark);cursor:pointer}
+.conditional-block{
+  background:var(--dg-green-light);border:1.5px solid #b2d8bb;
+  border-radius:8px;padding:16px;margin-top:8px;display:none;
+}
+.conditional-block.show{display:block}
+
+/* ===== VOID CHEQUE DIAGRAM ===== */
+.cheque-diagram{
+  background:#fffef5;border:2px dashed #c8a32a;
+  border-radius:10px;padding:18px;margin-top:10px;font-family:monospace;
+}
+.cheque-diagram .cheque-header{display:flex;justify-content:space-between;font-size:.8rem;color:#555;margin-bottom:12px}
+.cheque-diagram .cheque-payee{margin-bottom:12px;border-bottom:1.5px solid #aaa;padding-bottom:8px;font-size:.82rem}
+.cheque-diagram .cheque-numbers{
+  background:var(--white);border:1.5px solid #bbb;border-radius:6px;
+  padding:10px;font-size:.78rem;color:#333;text-align:center;
+}
+.cheque-diagram .cheque-numbers .row{display:flex;justify-content:center;gap:20px;flex-wrap:wrap}
+.cheque-diagram .cheque-numbers .lbl{font-size:.68rem;color:#888;display:block;margin-bottom:2px}
+.cheque-diagram .cheque-numbers .box{
+  background:#f8f8f8;border:1px solid #ccc;border-radius:4px;
+  padding:4px 10px;font-size:.82rem;letter-spacing:2px;
+}
+.void-stamp{
+  color:var(--danger);border:3px solid var(--danger);
+  display:inline-block;padding:2px 10px;transform:rotate(-15deg);
+  font-size:1.1rem;font-weight:900;letter-spacing:3px;
+  margin:10px auto 0;display:block;width:fit-content;
+}
+
+/* ===== NAVIGATION BUTTONS ===== */
+.nav-btns{display:flex;gap:12px;justify-content:flex-end;margin-top:24px;flex-wrap:wrap}
+.btn{
+  padding:13px 28px;border:none;border-radius:8px;
+  font-size:.95rem;font-weight:700;cursor:pointer;
+  transition:all .15s;min-height:48px;min-width:120px;
+}
+.btn-primary{background:var(--ci-orange);color:#fff}
+.btn-primary:hover{background:#e07e0f}
+.btn-secondary{background:var(--dg-green);color:#fff}
+.btn-secondary:hover{background:#134820}
+.btn-outline{background:#fff;color:var(--dg-green);border:2px solid var(--dg-green)}
+.btn-outline:hover{background:var(--dg-green-light)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#a93226}
+.btn-sm{padding:7px 14px;font-size:.8rem;min-height:36px;min-width:0}
+
+/* ===== DOCUMENTS SECTION ===== */
+.doc-card{
+  background:#fff;border:1.5px solid var(--border);border-radius:10px;
+  margin-bottom:16px;overflow:hidden;
+}
+.doc-header{
+  display:flex;align-items:center;gap:12px;padding:14px 18px;
+  cursor:pointer;background:var(--light-bg);
+  border-bottom:1.5px solid transparent;transition:background .15s;
+  min-height:60px;
+}
+.doc-header:hover{background:#f0f0f0}
+.doc-header.open{background:var(--dg-green-light);border-bottom-color:var(--dg-green)}
+.doc-num{
+  background:var(--ci-orange);color:#fff;
+  width:28px;height:28px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;
+  font-size:.8rem;font-weight:700;flex-shrink:0;
+}
+.doc-title{font-weight:700;font-size:.95rem;color:var(--text-dark);flex:1}
+.doc-badge{
+  padding:4px 10px;border-radius:20px;font-size:.73rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;
+}
+.doc-badge.unsigned{background:#ffeaea;color:var(--danger);border:1px solid #f5c6c6}
+.doc-badge.signed{background:#e6f9ed;color:var(--success);border:1px solid #b2e5c0}
+.doc-chevron{font-size:1rem;color:#999;transition:transform .2s;flex-shrink:0}
+.doc-header.open .doc-chevron{transform:rotate(180deg)}
+
+.doc-body{display:none;padding:20px}
+.doc-body.show{display:block}
+
+/* ===== POLICY DOCUMENT STYLES ===== */
+.policy-doc{
+  background:#fff;border:1px solid #ddd;border-radius:6px;
+  padding:24px;max-height:420px;overflow-y:auto;
+  font-size:.88rem;line-height:1.65;color:var(--text-dark);
+  margin-bottom:16px;
+}
+.policy-doc h2{font-size:1.05rem;font-weight:700;text-align:center;margin-bottom:14px;text-decoration:underline}
+.policy-doc h3{font-size:.92rem;font-weight:700;margin:14px 0 6px;text-decoration:underline}
+.policy-doc p{margin-bottom:10px}
+.policy-doc ul,.policy-doc ol{padding-left:20px;margin-bottom:10px}
+.policy-doc li{margin-bottom:5px}
+.policy-doc .section{margin-bottom:18px}
+.policy-doc .subsection{font-weight:700;margin-bottom:4px}
+
+/* ===== FORM WITHIN DOCUMENT ===== */
+.doc-form-section{
+  background:#fafafa;border:1.5px solid #e0e0e0;border-radius:8px;
+  padding:16px;margin-bottom:14px;
+}
+.doc-form-section .section-label{
+  font-weight:700;font-size:.85rem;color:var(--dg-green);
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;
+  border-bottom:1px solid #ddd;padding-bottom:6px;
+}
+.inline-field-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.inline-field-row .field-label{font-size:.83rem;font-weight:600;color:var(--text-mid);white-space:nowrap}
+.inline-field-row input,.inline-field-row select{
+  font-size:15px;padding:7px 10px;border:1.5px solid var(--border);
+  border-radius:6px;outline:none;min-height:40px;
+}
+.inline-field-row input:focus,.inline-field-row select:focus{border-color:var(--ci-orange)}
+.field-flex{display:flex;flex:1;gap:10px;flex-wrap:wrap}
+.sig-label{font-size:.83rem;font-weight:600;margin-bottom:4px;color:var(--text-mid)}
+
+/* ===== SIGNATURE PAD ===== */
+.sig-section{
+  background:#fff5e6;border:2px solid var(--ci-orange);border-radius:8px;
+  padding:16px;margin-top:14px;
+}
+.sig-section h4{font-size:.9rem;font-weight:700;color:var(--ci-orange);margin-bottom:10px}
+.sig-canvas-wrap{position:relative;margin-bottom:10px}
+canvas.sig-pad{
+  border:2px solid #ccc;border-radius:6px;width:100%;max-width:520px;
+  height:120px;background:#fff;cursor:crosshair;touch-action:none;display:block;
+}
+canvas.sig-pad.signed-canvas{border-color:var(--success)}
+.sig-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sig-date{font-size:.78rem;color:var(--text-light);margin-left:auto}
+
+/* ===== REVIEW STEP ===== */
+.review-section{
+  background:var(--dg-green-light);border:1.5px solid #b2d8bb;
+  border-radius:8px;padding:16px;margin-bottom:14px;
+}
+.review-section h3{font-size:.9rem;font-weight:700;color:var(--dg-green);margin-bottom:12px}
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+.review-item{font-size:.85rem}
+.review-item .lbl{color:var(--text-light);font-size:.75rem}
+.review-item .val{font-weight:600}
+.doc-status-list{list-style:none}
+.doc-status-list li{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 0;border-bottom:1px solid #ddd;font-size:.87rem;
+}
+.doc-status-list li:last-child{border-bottom:none}
+.status-icon{font-size:1.1rem}
+
+/* ===== ADMIN VIEW ===== */
+.admin-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:16px;
+}
+.admin-overlay.show{display:flex}
+.admin-modal{
+  background:#fff;border-radius:12px;width:100%;max-width:960px;
+  max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.3);
+}
+.admin-modal-header{
+  background:linear-gradient(135deg,var(--ci-navy),#1a1f5c);
+  padding:16px 20px;border-radius:12px 12px 0 0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.admin-modal-header h2{color:#fff;font-size:1.1rem}
+.admin-modal-body{padding:20px}
+.admin-table-wrap{overflow-x:auto}
+table.admin-table{border-collapse:collapse;width:100%;font-size:.82rem}
+table.admin-table th{background:var(--ci-navy);color:#fff;padding:10px 12px;text-align:left;white-space:nowrap}
+table.admin-table td{padding:9px 12px;border-bottom:1px solid #eee;vertical-align:top}
+table.admin-table tr:nth-child(even) td{background:#fafafa}
+table.admin-table .check{color:var(--success);font-size:1rem}
+table.admin-table .cross{color:var(--danger);font-size:1rem}
+
+/* ===== MODAL ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.show{display:flex}
+.modal-box{background:#fff;border-radius:12px;padding:28px;max-width:480px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.3)}
+.modal-box h2{color:var(--dg-green);margin-bottom:12px}
+.modal-box p{color:var(--text-mid);margin-bottom:20px;font-size:.9rem}
+.modal-box .ref{font-size:1.1rem;font-weight:700;color:var(--ci-orange);letter-spacing:2px;margin-bottom:20px}
+
+/* ===== TOP NAV BAR ===== */
+.top-bar{
+  background:var(--ci-navy);padding:8px 20px;
+  display:flex;justify-content:flex-end;gap:10px;align-items:center;
+}
+.top-bar-inner{max-width:900px;margin:0 auto;width:100%;display:flex;justify-content:flex-end;gap:10px}
+
+/* ===== PASSWORD GATE ===== */
+.pw-gate{padding:20px;max-width:360px}
+.pw-gate input{font-size:16px;padding:10px 12px;border:1.5px solid #ccc;border-radius:8px;width:100%;margin-bottom:10px;min-height:48px}
+.pw-gate .err{color:var(--danger);font-size:.82rem;margin-top:6px;display:none}
+
+/* ===== CONFETTI SUCCESS ===== */
+.success-icon{font-size:3rem;margin-bottom:8px}
+
+/* ===== VALIDATION ===== */
+input.invalid,select.invalid{border-color:var(--danger) !important}
+.field-error{color:var(--danger);font-size:.73rem;margin-top:2px;display:none}
+.field-error.show{display:block}
+
+/* ===== TD1 SPECIFIC ===== */
+.td1-table{width:100%;border-collapse:collapse;font-size:.83rem;margin-bottom:14px}
+.td1-table td{padding:8px 10px;border:1px solid #ddd;vertical-align:top}
+.td1-table td:first-child{width:75%}
+.td1-table td:last-child{width:25%;min-width:100px}
+.td1-table input[type=text]{width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;font-size:15px}
+.td1-line-num{font-weight:700;color:var(--dg-green);margin-right:4px}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+  .form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr}
+  .review-grid{grid-template-columns:1fr}
+  .header-ci{display:none}
+  .step-pill{font-size:.65rem;padding:6px 2px}
+  .btn{min-width:100px;padding:12px 18px}
+  canvas.sig-pad{height:100px}
+  .inline-field-row{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-block">
+      <div class="logo-dg">
+        <span style="font-size:26px;line-height:1">DG</span>
+        <span class="sub">Hotels</span>
+      </div>
+      <div class="header-title">
+        <h1>Comfort Inn &amp; Suites Bradford</h1>
+        <p>New Employee Onboarding — Dhanoa Group Hotels</p>
+      </div>
+    </div>
+    <div class="header-ci">
+      <div class="ci-badge">Comfort™<br>INN &amp; SUITES</div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== TOP NAV (ADMIN) ===== -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <button class="btn btn-outline btn-sm" onclick="openAdmin()" style="border-color:#fff;color:#fff;background:transparent">🔐 Admin Portal</button>
+  </div>
+</div>
+
+<!-- ===== PROGRESS ===== -->
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="step-pill active" id="pill-1">1. Personal Info</div>
+    <div class="step-pill" id="pill-2">2. Banking</div>
+    <div class="step-pill" id="pill-3">3. Documents</div>
+    <div class="step-pill" id="pill-4">4. Review &amp; Submit</div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+
+<!-- =========================================
+     STEP 1 — PERSONAL INFORMATION
+     ========================================= -->
+<div class="step-panel active" id="step-1">
+  <div class="card">
+    <div class="card-title"><span class="icon">👤</span> Personal Information</div>
+
+    <div class="form-row cols-2">
+      <div class="form-group">
+        <label for="fullName">Full Name (must match SIN) *</label>
+        <input type="text" id="fullName" placeholder="As it appears on your SIN card" autocomplete="name">
+        <span class="field-error" id="err-fullName">Please enter your full name.</span>
+      </div>
+      <div class="form-group">
+        <label for="phone">Cell Phone *</label>
+        <input type="tel" id="phone" placeholder="e.g. 416-555-1234" autocomplete="tel">
+        <span class="field-error" id="err-phone">Please enter your phone number.</span>
+      </div>
+    </div>
+
+    <div class="form-row cols-2">
+      <div class="form-group">
+        <label for="email">Email Address *</label>
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+        <span class="field-error" id="err-email">Please enter a valid email.</span>
+      </div>
+      <div class="form-group">
+        <label for="dob">Date of Birth (DD/MM/YYYY) *</label>
+        <input type="text" id="dob" placeholder="DD/MM/YYYY" maxlength="10">
+        <span class="field-error" id="err-dob">Please enter your date of birth.</span>
+      </div>
+    </div>
+
+    <div class="form-row cols-1">
+      <div class="form-group">
+        <label for="address">Street Address *</label>
+        <input type="text" id="address" placeholder="Street address" autocomplete="street-address">
+      </div>
+    </div>
+    <div class="form-row cols-3">
+      <div class="form-group">
+        <label for="city">City *</label>
+        <input type="text" id="city" placeholder="City" autocomplete="address-level2">
+        <span class="field-error" id="err-city">Required.</span>
+      </div>
+      <div class="form-group">
+        <label for="province">Province *</label>
+        <select id="province" autocomplete="address-level1">
+          <option value="">Select…</option>
+          <option value="ON" selected>Ontario</option>
+          <option value="AB">Alberta</option>
+          <option value="BC">British Columbia</option>
+          <option value="MB">Manitoba</option>
+          <option value="NB">New Brunswick</option>
+          <option value="NL">Newfoundland</option>
+          <option value="NS">Nova Scotia</option>
+          <option value="PE">PEI</option>
+          <option value="QC">Quebec</option>
+          <option value="SK">Saskatchewan</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="postal">Postal Code *</label>
+        <input type="text" id="postal" placeholder="A1A 1A1" maxlength="7" autocomplete="postal-code">
+      </div>
+    </div>
+
+    <div class="form-row cols-2">
+      <div class="form-group">
+        <label for="sin">Social Insurance Number (SIN) *</label>
+        <div class="sin-wrap">
+          <input type="password" id="sin" placeholder="Enter 9-digit SIN" maxlength="9" inputmode="numeric">
+          <button type="button" class="sin-toggle" onclick="toggleSin()" title="Show/hide SIN">👁</button>
+        </div>
+        <span class="hint">Stored securely. Will be masked in the review.</span>
+        <span class="field-error" id="err-sin">Please enter your 9-digit SIN.</span>
+      </div>
+      <input type="hidden" id="hotelLocation" value="Comfort Inn &amp; Suites Bradford, ON">
+    </div>
+
+    <!-- Work Permit -->
+    <div class="checkbox-row">
+      <input type="checkbox" id="workPermitCheck" onchange="toggleWorkPermit()">
+      <label for="workPermitCheck">I am legally entitled to work in Canada (I hold a work permit / study permit)</label>
+    </div>
+    <div class="conditional-block" id="workPermitBlock">
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label for="permitNumber">Permit Number *</label>
+          <input type="text" id="permitNumber" placeholder="e.g. A123456789">
+        </div>
+        <div class="form-group">
+          <label for="permitExpiry">Permit Expiry Date *</label>
+          <input type="text" id="permitExpiry" placeholder="DD/MM/YYYY">
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label>Does your study permit qualify you to work off campus?</label>
+          <select id="offCampus">
+            <option value="">Select…</option>
+            <option>Yes</option>
+            <option>No</option>
+            <option>N/A – Work Permit</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="hoursEntitled">If yes, hours entitled to work per week</label>
+          <input type="number" id="hoursEntitled" placeholder="e.g. 20" min="0" max="168">
+        </div>
+      </div>
+    </div>
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="paidFeesCheck">
+      <label for="paidFeesCheck">I have NOT paid any fees to any person(s) to obtain this interview / secure this job</label>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn btn-primary" onclick="nextStep(1)">Next: Banking Info →</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     STEP 2 — BANKING INFORMATION
+     ========================================= -->
+<div class="step-panel" id="step-2">
+  <div class="card">
+    <div class="card-title"><span class="icon">🏦</span> Banking Information – Direct Deposit</div>
+    <p style="font-size:.85rem;color:var(--text-light);margin-bottom:18px">
+      This information will be used for direct deposit of your pay cheque. Please provide a void cheque or complete the details below.
+    </p>
+
+    <div class="form-row cols-1">
+      <div class="form-group">
+        <label for="bankName">Financial Institution Name *</label>
+        <input type="text" id="bankName" placeholder="e.g. Royal Bank of Canada">
+        <span class="field-error" id="err-bankName">Required.</span>
+      </div>
+    </div>
+    <div class="form-row cols-3">
+      <div class="form-group">
+        <label for="institutionNo">Institution Number * (3 digits)</label>
+        <input type="text" id="institutionNo" placeholder="e.g. 003" maxlength="3" inputmode="numeric">
+        <span class="field-error" id="err-institutionNo">3-digit institution number required.</span>
+      </div>
+      <div class="form-group">
+        <label for="transitNo">Transit Number * (5 digits)</label>
+        <input type="text" id="transitNo" placeholder="e.g. 12345" maxlength="5" inputmode="numeric">
+        <span class="field-error" id="err-transitNo">5-digit transit number required.</span>
+      </div>
+      <div class="form-group">
+        <label for="accountNo">Account Number *</label>
+        <input type="text" id="accountNo" placeholder="e.g. 1234567" maxlength="12" inputmode="numeric">
+        <span class="field-error" id="err-accountNo">Account number required.</span>
+      </div>
+    </div>
+    <div class="form-row cols-2">
+      <div class="form-group">
+        <label for="accountType">Account Type</label>
+        <select id="accountType">
+          <option value="Chequing">Chequing</option>
+          <option value="Savings">Savings</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- VOID CHEQUE DIAGRAM -->
+    <div class="cheque-diagram">
+      <div class="cheque-header">
+        <span><strong>YOUR NAME</strong></span>
+        <span>Cheque # 0001</span>
+      </div>
+      <div class="cheque-payee">PAY TO THE ORDER OF: _____________________________________ $ ________</div>
+      <div class="cheque-numbers">
+        <div class="row">
+          <div>
+            <span class="lbl">Transit Number (5 digits)</span>
+            <span class="box" id="diag-transit">— — — — —</span>
+          </div>
+          <div>
+            <span class="lbl">Institution Number (3 digits)</span>
+            <span class="box" id="diag-inst">— — —</span>
+          </div>
+          <div>
+            <span class="lbl">Account Number</span>
+            <span class="box" id="diag-acct">— — — — — — —</span>
+          </div>
+        </div>
+      </div>
+      <div class="void-stamp">VOID</div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn btn-outline" onclick="prevStep(2)">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep(2)">Next: Documents →</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     STEP 3 — DOCUMENTS
+     ========================================= -->
+<div class="step-panel" id="step-3">
+  <div class="card" style="padding:16px 20px 10px">
+    <div class="card-title"><span class="icon">📄</span> Documents &amp; Signatures</div>
+    <p style="font-size:.85rem;color:var(--text-light);margin-bottom:12px">
+      Please read each document carefully, complete any required fields, and sign at the bottom of each section.
+      All <strong>9 documents</strong> must be signed before you can submit.
+    </p>
+  </div>
+
+  <!-- ---- DOC 1: Employee Information & Agreement Package ---- -->
+  <div class="doc-card" id="doc-card-1">
+    <div class="doc-header" onclick="toggleDoc(1)">
+      <div class="doc-num">1</div>
+      <div class="doc-title">Employee Information &amp; Agreement Package</div>
+      <span class="doc-badge unsigned" id="badge-1">Unsigned</span>
+      <span class="doc-chevron">▼</span>
+    </div>
+    <div class="doc-body" id="doc-body-1">
+      <div class="policy-doc">
+        <h2>New Employee Information &amp; Agreement Package</h2>
+        <p style="text-align:center;font-size:.78rem;color:#777">To be used by Dhanoa Group and associated companies</p>
+
+        <div class="section">
+          <h3>(1) Personal Information</h3>
+          <p>This information is collected for payroll and employment administration purposes.</p>
+        </div>
+
+        <div class="section">
+          <h3>(2) Cashier Agreement</h3>
+          <p>I accept responsibility for my Cash Float and Cash Receipts processed through my cash register during my shift as cashier. I agree that I will not allow anyone else access to my register or cash drawer without my consent. At the end of my shift I will ensure I have all required electronic payment receipts.</p>
+          <p>I am aware that a serious and/or frequent violation of any of the above procedure and/or the repeated occurrence of cash shortages will result in disciplinary action up to termination of employment.</p>
+        </div>
+
+        <div class="section">
+          <h3>(3) Email Consent</h3>
+          <p>I agree to allow my employer (the Company) to send any work-related documents and information, including paystubs and policies, to this email address. I will provide my employer one month's notice when changing my email address.</p>
+        </div>
+
+        <div class="section">
+          <h3>(4) Termination Agreement</h3>
+          <p>I hereby agree to give my employer (the Company) written notice that I wish to terminate my employment within the required timeframe as determined by The Employment Standards Act (ESA). It is agreed that once I provide this written notice, I will continue to work my regularly scheduled hours and shifts for the duration of this notice period.</p>
+          <p>Your employment with DG Hotels may be terminated as follows:</p>
+          <ol>
+            <li>By us, at any time, for just cause, without providing you with notice of termination or pay in lieu of notice.</li>
+            <li>By us, at any time without just cause for any reason, by providing you with notice of termination or pay in lieu of notice and severance pay (if applicable) as prescribed by the Ontario Employment Standards Act, 2000.</li>
+          </ol>
+        </div>
+
+        <div class="section">
+          <h3>(5) Direct Deposit Authorization</h3>
+          <p>I authorize my employer (the Company) to deposit my pay cheque to the account of the void cheque or Bank Institution Document handed in, if the Company chooses to use the direct deposit method of payment. If any information is incorrect, I understand that there will be a $10 fee charged to me. I will provide my employer one month's notice when changing my bank account information.</p>
+        </div>
+
+        <div class="section">
+          <h3>(6) Store Policies</h3>
+          <p>I have read and understand the policies that were sent to my approved email address. This includes policies regarding: Store Policies A; Store Policies B; Discrimination, Harassment and Violence in the Workplace; Employee Use of Electronic Media; Performance Reviews and Personal Information Protection.</p>
+          <p>I have also read and understand fully all agreements listed on this form. I understand that my employment is governed by these employment policies, as amended from time to time. I understand that a violation of these policies or agreements can and will result in disciplinary action and may result in termination.</p>
+        </div>
+
+        <div class="section">
+          <h3>(7) Consent for Collection, Use and Disclosure of Personal Information</h3>
+          <p>The purpose of this consent is to enable us as your employer, to comply with our statutory obligations under applicable Federal and Provincial privacy laws.</p>
+          <ol>
+            <li>During your employment, we will collect, create, use or disclose certain personal information related to you for the administration of payroll and benefits or other matters relating to your employment and the necessary conduct of its business ("Personal Information"). We will make every reasonable effort to ensure the accuracy and completeness of the Personal Information and will make every reasonable effort to protect it.</li>
+            <li>You may withdraw your consent to the collection, use or disclosure of the Personal Information by giving reasonable notice to us of your wish to withdraw consent unless such withdrawal would frustrate the performance of a legal obligation.</li>
+            <li>If you have any questions, please talk to your hotel manager or Franchisee.</li>
+          </ol>
+        </div>
+
+        <div class="section">
+          <h3>(8) Ethical Conduct</h3>
+          <p>DG Hotels does not wish to interfere in the private lives of its employees. But when relatives or persons involved in a dating relationship work in the same area of an organization, it may cause problems at work. Therefore, DG Hotels believes that it is in everyone's best interest to establish clear boundaries with respect to relationships between employees.</p>
+          <p>Our policy is that an employee may not directly work for a relative or supervise a relative. We also do not allow an employee in a dating relationship to directly work for the employee that they are dating. A violation of this policy may result in discipline up to and including termination of employment.</p>
+        </div>
+
+        <div class="section">
+          <h3>(9) Probation</h3>
+          <p>The first three (3) months of your employment with us will constitute a probationary period (the "Probationary Period"). During the Probationary period, we may terminate your employment without notice if, in our sole discretion, we determine that for any reason you are unsuitable for the position for which you were hired.</p>
+        </div>
+
+        <div class="section">
+          <h3>(10) Overtime Agreement</h3>
+          <p>I agree that, if certain conditions are met (according to the Employment Standards Act), my hours of work may be averaged over two weeks or more up to a maximum of four weeks for purposes of calculating entitlement to overtime pay.</p>
+        </div>
+
+        <div class="section">
+          <h3>(11) Foreign Nationals Agreement</h3>
+          <p>I understand that if I am a Foreign National, I am required to provide a valid work or study permit to my employer in order to secure this employment position. If I am working under the provisions of a study permit; I agree that it is my responsibility to ensure I am actively enrolled in the designated college/university in order to continue working. I also understand that once my study or work permit has expired, my employer will effectively terminate my position.</p>
+        </div>
+
+        <div class="section">
+          <h3>(12) Electronic T4 Statement</h3>
+          <p>I understand that while employed with DG Hotels my T4 will be available to me electronically on my Payworks secure portal. I understand that once I am no longer employed with DG Hotels my T4 will be emailed to me to my last provided email address.</p>
+        </div>
+      </div>
+
+      <div class="sig-section">
+        <h4>✍️ Sign &amp; Accept – Employee Information &amp; Agreement Package</h4>
+        <p style="font-size:.82rem;color:#555;margin-bottom:10px">By signing below, I confirm I have read and agree to all 12 sections of this agreement.</p>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sig-1" width="520" height="120"></canvas>
+        </div>
+        <div class="sig-controls">
+          <button class="btn btn-outline btn-sm" onclick="clearSig(1)">Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="acceptSig(1)">✅ Sign &amp; Accept</button>
+          <span class="sig-date" id="sig-date-1"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- DOC 2: ESA Poster ---- -->
+  <div class="doc-card" id="doc-card-2">
+    <div class="doc-header" onclick="toggleDoc(2)">
+      <div class="doc-num">2</div>
+      <div class="doc-title">Employment Standards Act (ESA) Poster 2018</div>
+      <span class="doc-badge unsigned" id="badge-2">Unsigned</span>
+      <span class="doc-chevron">▼</span>
+    </div>
+    <div class="doc-body" id="doc-body-2">
+      <div class="policy-doc">
+        <h2>Employment Standards in Ontario</h2>
+        <p><strong>Ministry of Labour</strong> — Fair at Work Ontario</p>
+        <p>The <em>Employment Standards Act, 2000</em> (ESA) protects employees and sets minimum standards for most workplaces in Ontario.</p>
+        <p><strong>Employers are prohibited from penalizing employees in any way for exercising their ESA rights.</strong></p>
+
+        <h3>What you need to know</h3>
+
+        <div class="section">
+          <div class="subsection">Minimum Wage</div>
+          <p>Most employees are entitled to be paid at least the minimum wage. For current rates visit: <strong>Ontario.ca/minimumwage</strong></p>
+        </div>
+
+        <div class="section">
+          <div class="subsection">Hours of Work and Overtime</div>
+          <p>There are daily and weekly limits on hours of work, and rules around meal breaks, rest periods and overtime.</p>
+        </div>
+
+        <div class="section">
+          <div class="subsection">Public Holidays</div>
+          <p>Ontario has a number of public holidays each year. Most employees are entitled to take these days off work and be paid public holiday pay.</p>
+        </div>
+
+        <div class="section">
+          <div class="subsection">Vacation Time and Pay</div>
+          <p>Most employees earn vacation time after every 12 months of work. There are rules around the amount of vacation pay an employee earns.</p>
+        </div>
+
+        <div class="section">
+          <div class="subsection">Termination Notice and Pay</div>
+          <p>In most cases, employers must give advance written notice when terminating employment and/or termination pay instead of notice.</p>
+        </div>
+
+        <div class="section">
+          <div class="subsection">Leaves of Absence</div>
+          <p>There are a number of job-protected leaves of absence in Ontario. Examples include pregnancy, parental, family caregiver, personal emergency leave (paid and unpaid) and sexual and/or domestic violence leave (paid and unpaid).</p>
+        </div>
+
+        <div class="section">
+          <div class="subsection">Other Employment Rights, Exemptions and Special Rules</div>
+          <p>There are other rights, exemptions and special rules not listed on this poster including rights to severance pay and special rules for assignment employees of temporary help agencies.</p>
+        </div>
+
+        <p>Learn more about your rights at: <strong>Ontario.ca/employmentstandards</strong><br>
+        1-800-531-5551 or TTY 1-866-567-8893</p>
+      </div>
+
+      <div class="sig-section">
+        <h4>✍️ Acknowledgement – ESA Poster</h4>
+        <p style="font-size:.82rem;color:#555;margin-bottom:10px">By signing, I acknowledge I have received and read the Employment Standards Act poster and understand my rights.</p>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sig-2" width="520" height="120"></canvas>
+        </div>
+        <div class="sig-controls">
+          <button class="btn btn-outline btn-sm" onclick="clearSig(2)">Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="acceptSig(2)">✅ Sign &amp; Accept</button>
+          <span class="sig-date" id="sig-date-2"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- DOC 3: TD1 Tax Form ---- -->
+  <div class="doc-card" id="doc-card-3">
+    <div class="doc-header" onclick="toggleDoc(3)">
+      <div class="doc-num">3</div>
+      <div class="doc-title">TD1 – 2021 Personal Tax Credits Return</div>
+      <span class="doc-badge unsigned" id="badge-3">Unsigned</span>
+      <span class="doc-chevron">▼</span>
+    </div>
+    <div class="doc-body" id="doc-body-3">
+      <div class="policy-doc">
+        <h2>2021 Personal Tax Credits Return — TD1</h2>
+        <p style="font-size:.8rem;color:#777;text-align:center">Protected B when completed — Canada Revenue Agency</p>
+        <p>Read page 2 before filling out this form. Your employer or payer will use this form to determine the amount of your tax deductions. Fill out this form based on the best estimate of your circumstances.</p>
+        <p>If you do not fill out this form, your tax deductions will only include the basic personal amount, estimated by your employer or payer based on the income they pay you.</p>
+      </div>
+
+      <div class="doc-form-section">
+        <div class="section-label">Employee Information</div>
+        <div class="form-row cols-2">
+          <div class="form-group"><label>Last Name</label><input type="text" id="td1-lastname" placeholder="Last name"></div>
+          <div class="form-group"><label>First Name and Initial(s)</label><input type="text" id="td1-firstname" placeholder="First name and initial(s)"></div>
+        </div>
+        <div class="form-row cols-3">
+          <div class="form-group"><label>Date of Birth (YYYY/MM/DD)</label><input type="text" id="td1-dob" placeholder="YYYY/MM/DD" maxlength="10"></div>
+          <div class="form-group"><label>Employee Number (if assigned)</label><input type="text" id="td1-empno" placeholder="Optional"></div>
+          <div class="form-group"><label>Social Insurance Number</label><input type="text" id="td1-sin" placeholder="9 digits" maxlength="9" inputmode="numeric"></div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group"><label>Address</label><input type="text" id="td1-address" placeholder="Street address"></div>
+          <div class="form-group"><label>Postal Code</label><input type="text" id="td1-postal" placeholder="A1A 1A1" maxlength="7"></div>
+        </div>
+        <div class="form-row cols-1">
+          <div class="form-group"><label>For non-residents only – Country of permanent residence</label><input type="text" id="td1-country" placeholder="Leave blank if Canadian resident"></div>
+        </div>
+      </div>
+
+      <div class="doc-form-section">
+        <div class="section-label">Tax Credit Lines</div>
+        <table class="td1-table">
+          <tr><td><span class="td1-line-num">1.</span> <strong>Basic personal amount</strong> – Every resident of Canada can enter a basic personal amount of $13,808. If your net income from all sources will be greater than $151,978, you may calculate a partial claim using Form TD1-WS.</td>
+            <td><input type="text" id="td1-l1" value="13808.00" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">2.</span> <strong>Canada caregiver amount for infirm children under age 18</strong> – Either parent (but not both), may claim $2,295 for each infirm child born in 2004 or later that resides with both parents throughout the year.</td>
+            <td><input type="text" id="td1-l2" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">3.</span> <strong>Age amount</strong> – If you will be 65 or older on December 31, 2021, and your net income for the year from all sources will be $38,893 or less, enter $7,713.</td>
+            <td><input type="text" id="td1-l3" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">4.</span> <strong>Pension income amount</strong> – If you will receive regular pension payments (excluding CPP, QPP, OAS, or GIS), enter $2,000 or your estimated annual pension income, whichever is less.</td>
+            <td><input type="text" id="td1-l4" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">5.</span> <strong>Tuition (full time and part time)</strong> – If you are a student paying more than $100 in tuition fees, enter the total tuition fees you will pay.</td>
+            <td><input type="text" id="td1-l5" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">6.</span> <strong>Disability amount</strong> – If you will claim the disability amount using Form T2201, enter $8,662.</td>
+            <td><input type="text" id="td1-l6" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">7.</span> <strong>Spouse or common-law partner amount</strong> – If you are supporting a spouse or common-law partner whose net income will be less than Line 1, enter the difference.</td>
+            <td><input type="text" id="td1-l7" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">8.</span> <strong>Amount for an eligible dependant</strong> – If you do not have a spouse or common-law partner and you support a dependent relative, enter the applicable amount.</td>
+            <td><input type="text" id="td1-l8" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">9.</span> <strong>Canada caregiver amount for eligible dependant or spouse/common-law partner</strong> – See Form TD1-WS if applicable.</td>
+            <td><input type="text" id="td1-l9" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">10.</span> <strong>Canada caregiver amount for dependant(s) age 18 or older</strong> – If you support an infirm dependant age 18 or older whose net income will be $17,256 or less, enter $7,348.</td>
+            <td><input type="text" id="td1-l10" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">11.</span> <strong>Amounts transferred from your spouse or common-law partner</strong> – Unused age amount, pension income amount, tuition amount, or disability amount.</td>
+            <td><input type="text" id="td1-l11" placeholder="$"></td></tr>
+          <tr><td><span class="td1-line-num">12.</span> <strong>Amounts transferred from a dependant</strong> – Unused disability amount or tuition amount from your dependant.</td>
+            <td><input type="text" id="td1-l12" placeholder="$"></td></tr>
+          <tr style="background:#fff8e1"><td><span class="td1-line-num">13.</span> <strong>TOTAL CLAIM AMOUNT</strong> – Add Lines 1 to 12. Your employer will use this to determine your tax deductions.</td>
+            <td><input type="text" id="td1-l13" placeholder="$ Total" style="font-weight:700;background:#fffde7"></td></tr>
+        </table>
+
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label><input type="checkbox" id="td1-multiemployer" style="margin-right:6px"> More than one employer / payer (enter "0" on Line 13)</label>
+          </div>
+          <div class="form-group">
+            <label><input type="checkbox" id="td1-incomelow" style="margin-right:6px"> Total income less than total claim amount</label>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:10px">
+          <label>Additional tax to be deducted (per payment period)</label>
+          <input type="text" id="td1-addl" placeholder="$ 0.00" style="max-width:200px">
+        </div>
+        <div class="form-group" style="margin-top:10px">
+          <label>Deduction for living in a prescribed northern zone (if applicable)</label>
+          <input type="text" id="td1-zone" placeholder="$ 0.00" style="max-width:200px">
+        </div>
+      </div>
+
+      <div class="sig-section">
+        <h4>✍️ Certification – TD1 Tax Form</h4>
+        <p style="font-size:.82rem;color:#555;margin-bottom:10px">I certify that the information given on this form is correct and complete. It is a serious offence to make a false return.</p>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sig-3" width="520" height="120"></canvas>
+        </div>
+        <div class="sig-controls">
+          <button class="btn btn-outline btn-sm" onclick="clearSig(3)">Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="acceptSig(3)">✅ Sign &amp; Accept</button>
+          <span class="sig-date" id="sig-date-3"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- DOC 4: Customer Service Standards (FORM) ---- -->
+  <div class="doc-card" id="doc-card-4">
+    <div class="doc-header" onclick="toggleDoc(4)">
+      <div class="doc-num">4</div>
+      <div class="doc-title">Customer Service Standards – Acknowledgement Form</div>
+      <span class="doc-badge unsigned" id="badge-4">Unsigned</span>
+      <span class="doc-chevron">▼</span>
+    </div>
+    <div class="doc-body" id="doc-body-4">
+      <div class="policy-doc">
+        <h2>Customer Service — "Our Guests are Like God"</h2>
+        <p style="text-align:center;font-style:italic;color:#555">"Mahimāna raba kahi rahē hana" &nbsp;|&nbsp; "Les invités sont comme dire Dieu" &nbsp;|&nbsp; "Los invitados son como dios diciendo"</p>
+
+        <div class="section">
+          <h3>1. Do It Right From the Start</h3>
+          <p>While food and service quality are incredibly important, it is the experience guests have from the minute they walk in the door to the minute they exit that counts. We should aim to treat every guest as a guest in our own home.</p>
+          <ul>
+            <li>Greet your guests the minute they walk in the door.</li>
+            <li>Don't interrupt — listen intently and pay attention to what they want; be respectful at all times.</li>
+            <li>Be thoroughly versed on your services — this is YOUR responsibility. Ask questions and repeat orders to make sure you get it right.</li>
+            <li>Never make guests feel like you want them to leave.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>2. Fix Problems Immediately</h3>
+          <p>No matter how hard you try, something is going to go wrong some time or another. Whatever the problem, your goal is to please the customer. It is important that you deal with problems immediately. Even if you don't know the answer, be confident, and tell the guest <strong>"Just give me one minute, I will fix this for you."</strong> And then call your Manager.</p>
+          <ul>
+            <li>Own the mistake — acknowledge that, yes, there is a problem, and let them know you are very sorry.</li>
+            <li>Stay calm, especially if you don't agree with your customer. Maintain eye contact and watch your body language.</li>
+            <li>Always empathize, don't blame and apologize again!</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>3. Take Care of Special Requests and Special Circumstances</h3>
+          <p>Occasionally, guests will need special attention. This could be a parent who is juggling their kids and needs extra help, a person with disabilities who needs help, an elderly person who needs assistance, etc.</p>
+          <ul>
+            <li>Be respectful — at all times — even if their disability is confusing or unbelievable. Do not mock, or belittle the person — and always ask "How can I help?" before offering any assistance.</li>
+            <li>Take care of them, just like they were your family member.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="doc-form-section">
+        <div class="section-label">Form Fields</div>
+        <div class="form-row cols-2">
+          <div class="form-group"><label>Employee Name</label><input type="text" id="css-empname" placeholder="Your full name"></div>
+          <div class="form-group"><label>Trainer Name</label><input type="text" id="css-trainer" placeholder="Trainer's name"></div>
+        </div>
+      </div>
+
+      <div class="sig-section">
+        <h4>✍️ Acknowledgement – Customer Service Standards</h4>
+        <p style="font-size:.82rem;color:#555;margin-bottom:10px">By signing, I confirm I have read and understood the Customer Service Standards for DG Hotels.</p>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sig-4" width="520" height="120"></canvas>
+        </div>
+        <div class="sig-controls">
+          <button class="btn btn-outline btn-sm" onclick="clearSig(4)">Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="acceptSig(4)">✅ Sign &amp; Accept</button>
+          <span class="sig-date" id="sig-date-4"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- DOC 5: Customer Service Standard Policy ---- -->
+  <div class="doc-card" id="doc-card-5">
+    <div class="doc-header" onclick="toggleDoc(5)">
+      <div class="doc-num">5</div>
+      <div class="doc-title">Customer Service Standard Policy (AODA) – 2025</div>
+      <span class="doc-badge unsigned" id="badge-5">Unsigned</span>
+      <span class="doc-chevron">▼</span>
+    </div>
+    <div class="doc-body" id="doc-body-5">
+      <div class="policy-doc">
+        <h2>Customer Service Standard Policy</h2>
+        <p>We strive at all times to provide our products in a way that respects the dignity and independence of people with disabilities. We are also committed to giving people with disabilities the same opportunity to access our goods and services.</p>
+
+        <div class="section">
+          <h3>Communication</h3>
+          <p>Our employees will communicate with people with disabilities in ways that take into account their disability. We will train staff who communicate with customers on how to interact and communicate with people with various types of disabilities.</p>
+        </div>
+
+        <div class="section">
+          <h3>Use of Service Animals and Support Persons</h3>
+          <p>We welcome people with disabilities who are accompanied by a service animal on parts of our premises that are open to the public. We will also ensure that all staff, volunteers and others dealing with the public are properly trained in how to interact with people with disabilities who are accompanied by a service animal.</p>
+          <p>Any person with a disability who is accompanied by a support person will be allowed to enter the premises with his or her support person. At no time will a person with a disability who is accompanied by a support person be prevented from having access to his or her support person while on our premises.</p>
+        </div>
+
+        <div class="section">
+          <h3>Notice of Temporary Disruption</h3>
+          <p>We will provide customers with notice in the event of a planned or unexpected disruption in the facilities or services usually used by people with disabilities. This notice will include information about the reason for the disruption, its anticipated duration, and a description of alternative facilities or services, if available. The notice will be placed at all public entrances and service counters on our premises.</p>
+        </div>
+
+        <div class="section">
+          <h3>Training for Staff</h3>
+          <p>The Company will provide training to all employees who deal with the public and all those who are involved in the development and approval of customer service policies, practices and procedures. This training will be provided as part of the Choice University courses and will be completed within the first month of employment.</p>
+          <p><em>Training will include the following:</em></p>
+          <ul>
+            <li>The purposes of the Accessibility for Ontarians with Disabilities Act, 2005 and the requirements of the customer service standard</li>
+            <li>How to interact and communicate with people with various types of disabilities</li>
+            <li>How to interact with people with disabilities who use an assistive device or require the assistance of a service animal or a support person</li>
+            <li>How to use equipment or devices available on our premises that may help with the provision of goods or services to people with disabilities</li>
+            <li>What to do if a person with a disability is having difficulty in accessing our services</li>
+          </ul>
+          <p>Applicable staff will be trained on policies, practices and procedures that affect the way goods and services are provided to people with disabilities. Staff will also be trained on an ongoing basis when changes are made to these policies.</p>
+        </div>
+
+        <div class="section">
+          <h3>Feedback Process</h3>
+          <p>Feedback regarding the way we provide goods and services to people with disabilities can be made via: Email, In-person, Telephone, Letter, or Website.</p>
+          <p>All feedback will be directed to Upreet Dhanoa (President). Customers can expect to hear back in 2 business days.</p>
+        </div>
+        <p style="font-size:.73rem;color:#888;margin-top:14px">December 2025 – December 2024 guidelines. The use of such form letters is not mandatory nor does it necessarily meet the strict legal requirement applicable in every individual circumstance.</p>
+      </div>
+
+      <div class="sig-section">
+        <h4>✍️ Acknowledgement – Customer Service Standard Policy</h4>
+        <p style="font-size:.82rem;color:#555;margin-bottom:10px">By signing, I confirm I have read and understood the Customer Service Standard Policy.</p>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sig-5" width="520" height="120"></canvas>
+        </div>
+        <div class="sig-controls">
+          <button class="btn btn-outline btn-sm" onclick="clearSig(5)">Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="acceptSig(5)">✅ Sign &amp; Accept</button>
+          <span class="sig-date" id="sig-date-5"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- DOC 6: Accessible Workplace Policy ---- -->
+  <div class="doc-card" id="doc-card-6">
+    <div class="doc-header" onclick="toggleDoc(6)">
+      <div class="doc-num">6</div>
+      <div class="doc-title">Accessible Workplace Policy – 2025</div>
+      <span class="doc-badge unsigned" id="badge-6">Unsigned</span>
+      <span class="doc-chevron">▼</span>
+    </div>
+    <div class="doc-body" id="doc-body-6">
+      <div class="policy-doc">
+        <h2>Accessible Workplace Policy</h2>
+        <p>DG Hotels are committed to improving accessibility. We will put the following policies into practice as required by the Accessibility for Ontarians with Disabilities Act.</p>
+
+        <div class="section">
+          <h3>General</h3>
+          <ul>
+            <li>DG Hotels is committed to training staff on Ontario's accessibility laws and on accessibility aspects of the Human Rights Code that apply to persons with disabilities.</li>
+            <li>Training will be provided in a way that best suits the duties of employees, volunteers and other staff members.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>Information and Communications</h3>
+          <ul>
+            <li>DG Hotels is committed to meeting the communication needs of people with disabilities.</li>
+            <li>When asked, we will provide information and communications materials in accessible formats or with communication supports.</li>
+            <li>This includes publicly available information about our goods, services and facilities, as well as publicly available emergency information.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>Employment</h3>
+          <ul>
+            <li>DG Hotels will notify the public and staff that, when requested, we will accommodate disabilities during recruitment and assessment processes and when people are hired.</li>
+            <li>If needed, we will provide customized workplace emergency information to employees who have a disability.</li>
+            <li>If using performance management, career development and redeployment processes, we will take into account the accessibility needs of employees with disabilities.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>Design of Public Spaces</h3>
+          <p>DG Hotels will meet the Accessibility Standards for the Design of Public Spaces when building or making major modifications to public spaces. Public spaces include:</p>
+          <ul>
+            <li>Recreational trails/beach access routes</li>
+            <li>Accessible off street parking</li>
+            <li>Service-related elements like service counters, fixed queuing lines and waiting areas</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>Modifications to this or Other Policies</h3>
+          <ul>
+            <li>Any of our policies that do not respect and promote the dignity and independence of people with disabilities will be modified or removed.</li>
+          </ul>
+        </div>
+        <p style="font-size:.73rem;color:#888;margin-top:14px">December 2024 – This is intended as a guideline and not as a required action.</p>
+      </div>
+
+      <div class="sig-section">
+        <h4>✍️ Acknowledgement – Accessible Workplace Policy</h4>
+        <p style="font-size:.82rem;color:#555;margin-bottom:10px">By signing, I confirm I have read and understood the Accessible Workplace Policy.</p>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sig-6" width="520" height="120"></canvas>
+        </div>
+        <div class="sig-controls">
+          <button class="btn btn-outline btn-sm" onclick="clearSig(6)">Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="acceptSig(6)">✅ Sign &amp; Accept</button>
+          <span class="sig-date" id="sig-date-6"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- DOC 7: Discrimination, Harassment, Bullying & Violence Policy ---- -->
+  <div class="doc-card" id="doc-card-7">
+    <div class="doc-header" onclick="toggleDoc(7)">
+      <div class="doc-num">7</div>
+      <div class="doc-title">Discrimination, Harassment, Bullying &amp; Violence in the Workplace Policy</div>
+      <span class="doc-badge unsigned" id="badge-7">Unsigned</span>
+      <span class="doc-chevron">▼</span>
+    </div>
+    <div class="doc-body" id="doc-body-7">
+      <div class="policy-doc">
+        <h2>Discrimination, Harassment, Bullying and Violence in the Workplace Policy</h2>
+        <p>Employees are expected to treat one another with mutual respect, and must commit to fostering a work atmosphere free of discrimination, harassment, bullying, and violence. Acts of workplace discrimination, harassment, bullying, or violence against or by any employee are prohibited. It is also a violation of this policy for anyone to knowingly make a false complaint of discrimination, harassment, bullying, or violence, or to provide false information about a complaint.</p>
+        <p>DG Hotels is an equal opportunity employer and commits to ensuring every employee and candidate for employment is free from discrimination within employment or prospective employment.</p>
+
+        <div class="section">
+          <h3>Definitions</h3>
+          <ul>
+            <li><strong>Bullying:</strong> Any inappropriate conduct or comment by a person towards another worker that the person knew or ought to have known would cause that worker to be humiliated or intimidated. This includes cyberbullying.</li>
+            <li><strong>Discrimination:</strong> Treating someone differently based on their personal characteristics: race, ancestry, place of origin, colour, ethnic origin, citizenship, religion, creed, sex, gender identity, age, record of offences, marital status, family status, disability, sexual preference, pregnancy, or other protected ground.</li>
+            <li><strong>Harassment:</strong> A course of vexatious comments or conduct against an employee that is known or ought reasonably to be known to be unwelcome. This includes sexual harassment, inappropriate physical conduct, and acts that create an intimidating, offensive, degrading, humiliating, or hostile work environment.</li>
+            <li><strong>Sexual Harassment:</strong> Harassment against an employee on the basis of sex, sexual orientation, gender identity, or gender expression.</li>
+            <li><strong>Violence:</strong> The use or attempted use of physical force against an employee that could cause physical injury.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>Requirements</h3>
+          <ul>
+            <li><strong>Prohibited Actions</strong> include: bullying; workplace violence or harassment; any threat or intimidation; possession of a weapon on company property; assault or other acts of hostility or aggression; dangerous or threatening horseplay; retaliation against anyone who has made a complaint or participated in an investigation.</li>
+            <li><strong>Sanctions:</strong> Those who violate this policy are subject to disciplinary and/or corrective action, up to and including termination of employment for cause.</li>
+            <li><strong>Safety measures:</strong> Employees are strongly encouraged to: remove themselves from any immediate danger; contact emergency services where appropriate; follow all safety policies; immediately inform management about any safety risks; become familiar with the location of all building exits.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>Reporting Complaints and Incidents</h3>
+          <p>An employee who is a victim of harassment, bullying, discrimination, or violence by another employee may inform the wrongdoer that the wrongdoer's comments or conduct is unwelcome. If the employee is not comfortable doing so, the employee must report the problem to his or her manager. If the manager is the source of the problem, the report must be made to the next level of management or the franchisee.</p>
+          <p>Threats or assaults of a serious nature must be reported to the local police. If an incident causes the employee to fear for his or her safety, the employee must call 9-1-1 immediately.</p>
+        </div>
+
+        <div class="section">
+          <h3>No Retaliation</h3>
+          <p>There must be no retaliation against anyone who makes a bona fide report of harassment, discrimination, bullying, threats, or violence. Retaliation by another employee is strictly prohibited.</p>
+        </div>
+        <p style="font-size:.73rem;color:#888;margin-top:14px">December 2024 – This is intended as a guideline for the franchisee's convenience and not as a required action.</p>
+      </div>
+
+      <div class="sig-section">
+        <h4>✍️ Acknowledgement – Discrimination, Harassment, Bullying &amp; Violence Policy</h4>
+        <p style="font-size:.82rem;color:#555;margin-bottom:10px">By signing, I confirm I have read and understood this policy and agree to abide by it.</p>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sig-7" width="520" height="120"></canvas>
+        </div>
+        <div class="sig-controls">
+          <button class="btn btn-outline btn-sm" onclick="clearSig(7)">Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="acceptSig(7)">✅ Sign &amp; Accept</button>
+          <span class="sig-date" id="sig-date-7"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- DOC 8: Fitness for Work Policy ---- -->
+  <div class="doc-card" id="doc-card-8">
+    <div class="doc-header" onclick="toggleDoc(8)">
+      <div class="doc-num">8</div>
+      <div class="doc-title">Fitness for Work Policy</div>
+      <span class="doc-badge unsigned" id="badge-8">Unsigned</span>
+      <span class="doc-chevron">▼</span>
+    </div>
+    <div class="doc-body" id="doc-body-8">
+      <div class="policy-doc">
+        <h2>Fitness for Work Policy</h2>
+
+        <div class="section">
+          <h3>Policy Intent</h3>
+          <p>This policy supports the company's commitment to do its part in maintaining a safe and healthy work environment.</p>
+        </div>
+
+        <div class="section">
+          <h3>Policy Statement</h3>
+          <p>Employees are expected to be fit for work when reporting to their job and to remain fit for the duration of the working day.</p>
+        </div>
+
+        <div class="section">
+          <h3>Definitions</h3>
+          <p><strong>Fitness for Work:</strong> The state in which individuals are in a physical, mental, and emotional condition that enables them to perform their assigned duties effectively and in a manner that does not have a negative impact on themselves or others.</p>
+        </div>
+
+        <div class="section">
+          <h3>Requirements</h3>
+          <p><strong>Responsibilities of Employees:</strong></p>
+          <ul>
+            <li>Employees must not consume alcohol or recreational marijuana on company premises or in company vehicles.</li>
+            <li>They must not be in possession of or use any illicit drugs on company premises, in company vehicles, or at company-sponsored events.</li>
+            <li>If required to take prescription medicine which could impair their ability to safely carry out their work, employees should advise their supervisor.</li>
+            <li>Manage factors that may have an impact on their ability to perform the required work unimpaired.</li>
+            <li>Disclose, to their immediate supervisor or Manager, information about any factors that may impact their ability to perform work safely.</li>
+            <li>Ensure that their judgment and performance at work (including the operation of company vehicles) are never impaired by intoxicating substances, including alcohol and marijuana.</li>
+            <li>If in need of assistance with health challenges that may affect their fitness for work, discuss these concerns with their immediate supervisor and/or Manager.</li>
+          </ul>
+          <p><strong>Enforcement:</strong> If there is reason to believe that an employee's job performance is being affected negatively by his or her use of intoxicating substances, the company has the right to inquire as to the nature of the problem and to take appropriate action, which may include disciplinary action up to and including termination of employment.</p>
+        </div>
+        <p style="font-size:.73rem;color:#888;margin-top:14px">December 2024 – This is intended as a guideline for the franchisee's convenience and not as a required action.</p>
+      </div>
+
+      <div class="sig-section">
+        <h4>✍️ Acknowledgement – Fitness for Work Policy</h4>
+        <p style="font-size:.82rem;color:#555;margin-bottom:10px">By signing, I confirm I have read and understood the Fitness for Work Policy and agree to comply.</p>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sig-8" width="520" height="120"></canvas>
+        </div>
+        <div class="sig-controls">
+          <button class="btn btn-outline btn-sm" onclick="clearSig(8)">Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="acceptSig(8)">✅ Sign &amp; Accept</button>
+          <span class="sig-date" id="sig-date-8"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- DOC 9: Workplace Health and Safety Policy ---- -->
+  <div class="doc-card" id="doc-card-9">
+    <div class="doc-header" onclick="toggleDoc(9)">
+      <div class="doc-num">9</div>
+      <div class="doc-title">Workplace Health and Safety Policy</div>
+      <span class="doc-badge unsigned" id="badge-9">Unsigned</span>
+      <span class="doc-chevron">▼</span>
+    </div>
+    <div class="doc-body" id="doc-body-9">
+      <div class="policy-doc">
+        <h2>Workplace Health and Safety Policy</h2>
+        <p>We are very concerned and interested in the Health and Safety of employees. Protection of employees from injury or occupational disease is a continuing objective. We will make all reasonable efforts to provide a safe, healthy work environment. Employees and managers share an ongoing responsibility for worker Health and Safety. We strive to reduce the risk of fire and other property damage and to comply with all applicable legislation.</p>
+
+        <div class="section">
+          <h3>Procedure</h3>
+          <ul>
+            <li>Management will be held accountable for the Health and Safety of workers under their supervision. Management is responsible to ensure that machinery and equipment are safe and that employees work in compliance with established safe work practices and procedures. Employees must receive adequate training in their specific work tasks to protect their Health and Safety.</li>
+            <li>Management is required to ensure health and safety meetings occur as required by legislation.</li>
+            <li>Every employee must protect his or her own Health and Safety by working in compliance with the law and with safe work practices and procedures established by the company. Employees must report to work mentally and physically fit, rested and free from the effects of drugs and alcohol.</li>
+            <li>Employees must notify managers of any health and safety concerns, so that they may be dealt with promptly. Employees must report any injuries sustained at work that require either first aid or health care to their supervisor immediately.</li>
+            <li>Employees should not report to work if they have an infectious disease, wound, are vomiting or have diarrhea. They should contact management as soon as it becomes apparent that they should not report to work.</li>
+            <li>It is in the best interest of all parties to consider Health and Safety in every activity. Commitment to Health and Safety is an integral part of this hotel.</li>
+          </ul>
+        </div>
+        <p style="font-size:.73rem;color:#888;margin-top:14px">December 2024 – This is intended as a guideline and not as a required action.</p>
+      </div>
+
+      <div class="sig-section">
+        <h4>✍️ Acknowledgement – Workplace Health and Safety Policy</h4>
+        <p style="font-size:.82rem;color:#555;margin-bottom:10px">By signing, I confirm I have read and understood the Workplace Health and Safety Policy and agree to comply.</p>
+        <div class="sig-canvas-wrap">
+          <canvas class="sig-pad" id="sig-9" width="520" height="120"></canvas>
+        </div>
+        <div class="sig-controls">
+          <button class="btn btn-outline btn-sm" onclick="clearSig(9)">Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="acceptSig(9)">✅ Sign &amp; Accept</button>
+          <span class="sig-date" id="sig-date-9"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="prevStep(3)">← Back</button>
+    <button class="btn btn-primary" onclick="nextStep(3)">Next: Review &amp; Submit →</button>
+  </div>
+</div>
+
+<!-- =========================================
+     STEP 4 — REVIEW & SUBMIT
+     ========================================= -->
+<div class="step-panel" id="step-4">
+  <div class="card">
+    <div class="card-title"><span class="icon">✅</span> Review &amp; Submit</div>
+    <p style="font-size:.85rem;color:var(--text-light);margin-bottom:18px">Please review all information before submitting. Once submitted, the information will be saved for your manager.</p>
+
+    <div class="review-section">
+      <h3>👤 Personal Information</h3>
+      <div class="review-grid" id="review-personal"></div>
+    </div>
+
+    <div class="review-section">
+      <h3>🏦 Banking Information</h3>
+      <div class="review-grid" id="review-banking"></div>
+    </div>
+
+    <div class="review-section">
+      <h3>📄 Document Signing Status</h3>
+      <ul class="doc-status-list" id="review-docs"></ul>
+    </div>
+
+    <div id="submit-warning" style="display:none;background:#fff3cd;border:1.5px solid #ffc107;border-radius:8px;padding:12px;margin-bottom:14px;font-size:.85rem;color:#856404">
+      ⚠️ Please sign all 9 documents before submitting.
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn btn-outline" onclick="prevStep(4)">← Back</button>
+      <button class="btn btn-primary" onclick="submitForm()" id="submitBtn">🚀 Submit Onboarding Package</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- =========================================
+     ADMIN OVERLAY
+     ========================================= -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-modal">
+    <div class="admin-modal-header">
+      <h2>🔐 Admin Portal — DG Hotels Onboarding</h2>
+      <button class="btn btn-outline btn-sm" onclick="closeAdmin()" style="border-color:rgba(255,255,255,.5);color:#fff;background:transparent">✕ Close</button>
+    </div>
+    <div class="admin-modal-body">
+      <div id="admin-pw-gate" class="pw-gate">
+        <p style="margin-bottom:12px;font-size:.9rem;font-weight:600">Enter admin password to continue:</p>
+        <input type="password" id="adminPw" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminPw()">
+        <button class="btn btn-primary" onclick="checkAdminPw()">Login</button>
+        <div class="err" id="pw-err">Incorrect password. Please try again.</div>
+      </div>
+      <div id="admin-content" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+          <h3 style="color:var(--dg-green)">Employee Submissions</h3>
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑 Clear All Data</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="adminTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Hotel Location</th>
+                <th>Submitted</th>
+                <th>D1</th><th>D2</th><th>D3</th><th>D4</th><th>D5</th><th>D6</th><th>D7</th><th>D8</th><th>D9</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+          <p id="no-records" style="color:var(--text-light);font-size:.85rem;padding:16px 0;display:none">No submissions yet.</p>
+        </div>
+        <p style="margin-top:12px;font-size:.72rem;color:#999">D1=Emp Info &amp; Agreement, D2=ESA Poster, D3=TD1 Tax, D4=CSS Form, D5=CSS Policy, D6=Accessible Workplace, D7=Discrimination/Harassment, D8=Fitness for Work, D9=Health &amp; Safety</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal-box">
+    <div class="success-icon">🎉</div>
+    <h2>Welcome to Comfort Inn &amp; Suites Bradford!</h2>
+    <p>Your onboarding package has been submitted successfully. Your manager will review your documents shortly.</p>
+    <div class="ref" id="success-ref">DGH-000000</div>
+    <button class="btn btn-secondary" onclick="document.getElementById('successModal').classList.remove('show');resetForm()">Start New Submission</button>
+  </div>
+</div>
+
+<!-- =========================================
+     JAVASCRIPT
+     ========================================= -->
+<script>
+// ---- STATE ----
+var currentStep = 1;
+var signedDocs = {};
+var sigCtx = {};
+
+var DOC_NAMES = {
+  1:'Employee Information & Agreement Package',
+  2:'ESA Poster 2018',
+  3:'TD1 Tax Form 2021',
+  4:'Customer Service Standards (Form)',
+  5:'Customer Service Standard Policy',
+  6:'Accessible Workplace Policy',
+  7:'Discrimination, Harassment, Bullying & Violence Policy',
+  8:'Fitness for Work Policy',
+  9:'Workplace Health & Safety Policy'
+};
+
+// ---- STEP NAVIGATION ----
+function showStep(n) {
+  document.querySelectorAll('.step-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.step-pill').forEach(function(p,i){
+    p.classList.remove('active','done');
+    if(i+1 < n) p.classList.add('done');
+    if(i+1 === n) p.classList.add('active');
+  });
+  document.getElementById('step-'+n).classList.add('active');
+  currentStep = n;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function nextStep(from) {
+  if(from === 1 && !validateStep1()) return;
+  if(from === 2 && !validateStep2()) return;
+  if(from === 3) {
+    var missing = [];
+    for(var i=1;i<=9;i++){ if(!signedDocs[i]) missing.push(i); }
+    if(missing.length > 0){
+      alert('Please sign all 9 documents before proceeding. Missing: Document(s) '+missing.join(', '));
+      return;
+    }
+  }
+  if(from === 3) populateReview();
+  showStep(from+1);
+}
+
+function prevStep(from){ showStep(from-1); }
+
+// ---- VALIDATION ----
+function validateStep1(){
+  var ok = true;
+  function req(id,errId,test){
+    var el = document.getElementById(id);
+    var err = document.getElementById(errId);
+    if(!test(el)){
+      el.classList.add('invalid');
+      if(err){ err.classList.add('show'); }
+      ok = false;
+    } else {
+      el.classList.remove('invalid');
+      if(err){ err.classList.remove('show'); }
+    }
+  }
+  req('fullName','err-fullName',function(e){ return e.value.trim().length>1; });
+  req('phone','err-phone',function(e){ return e.value.trim().length>5; });
+  req('email','err-email',function(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value); });
+  req('dob','err-dob',function(e){ return e.value.trim().length>4; });
+  req('sin','err-sin',function(e){ return /^\d{9}$/.test(e.value.trim()); });
+  // hotelLocation is fixed — no validation needed
+  return ok;
+}
+
+function validateStep2(){
+  var ok=true;
+  function req(id,errId,test){
+    var el=document.getElementById(id);
+    var err=document.getElementById(errId);
+    if(!test(el)){el.classList.add('invalid');if(err)err.classList.add('show');ok=false;}
+    else{el.classList.remove('invalid');if(err)err.classList.remove('show');}
+  }
+  req('bankName','err-bankName',function(e){ return e.value.trim().length>1; });
+  req('institutionNo','err-institutionNo',function(e){ return /^\d{3}$/.test(e.value.trim()); });
+  req('transitNo','err-transitNo',function(e){ return /^\d{5}$/.test(e.value.trim()); });
+  req('accountNo','err-accountNo',function(e){ return e.value.trim().length>4; });
+  return ok;
+}
+
+// ---- SIN TOGGLE ----
+function toggleSin(){
+  var inp = document.getElementById('sin');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ---- WORK PERMIT ----
+function toggleWorkPermit(){
+  var block = document.getElementById('workPermitBlock');
+  block.classList.toggle('show', document.getElementById('workPermitCheck').checked);
+}
+
+// ---- CHEQUE DIAGRAM LIVE UPDATE ----
+document.addEventListener('DOMContentLoaded', function(){
+  function upd(srcId,diagId){
+    var el=document.getElementById(srcId);
+    var diag=document.getElementById(diagId);
+    if(el&&diag){
+      el.addEventListener('input',function(){ diag.textContent=el.value||'—'; });
+    }
+  }
+  upd('transitNo','diag-transit');
+  upd('institutionNo','diag-inst');
+  upd('accountNo','diag-acct');
+
+  // Init signature pads
+  for(var i=1;i<=9;i++){ initSigPad(i); }
+});
+
+// ---- SIGNATURE PADS ----
+function initSigPad(n){
+  var canvas = document.getElementById('sig-'+n);
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  sigCtx[n] = ctx;
+  ctx.strokeStyle = '#2D3280';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  var drawing = false;
+  var lastX = 0, lastY = 0;
+
+  function getPos(e,canvas){
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+    if(e.touches){
+      return {
+        x:(e.touches[0].clientX - rect.left)*scaleX,
+        y:(e.touches[0].clientY - rect.top)*scaleY
+      };
+    }
+    return {
+      x:(e.clientX - rect.left)*scaleX,
+      y:(e.clientY - rect.top)*scaleY
+    };
+  }
+
+  function start(e){
+    e.preventDefault();
+    drawing=true;
+    var pos=getPos(e,canvas);
+    lastX=pos.x; lastY=pos.y;
+    ctx.beginPath();
+    ctx.moveTo(lastX,lastY);
+  }
+  function move(e){
+    e.preventDefault();
+    if(!drawing) return;
+    var pos=getPos(e,canvas);
+    ctx.lineTo(pos.x,pos.y);
+    ctx.stroke();
+    lastX=pos.x; lastY=pos.y;
+  }
+  function end(e){ e.preventDefault(); drawing=false; }
+
+  canvas.addEventListener('mousedown',start);
+  canvas.addEventListener('mousemove',move);
+  canvas.addEventListener('mouseup',end);
+  canvas.addEventListener('mouseleave',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',end,{passive:false});
+}
+
+function clearSig(n){
+  var canvas=document.getElementById('sig-'+n);
+  var ctx=sigCtx[n];
+  if(ctx) ctx.clearRect(0,0,canvas.width,canvas.height);
+  signedDocs[n]=false;
+  updateBadge(n,false);
+  document.getElementById('sig-date-'+n).textContent='';
+  canvas.classList.remove('signed-canvas');
+}
+
+function acceptSig(n){
+  var canvas=document.getElementById('sig-'+n);
+  var ctx=sigCtx[n];
+  if(!ctx) return;
+  var blank=true;
+  var data=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  for(var i=3;i<data.length;i+=4){ if(data[i]>0){ blank=false; break; } }
+  if(blank){ alert('Please draw your signature on the pad before accepting.'); return; }
+
+  signedDocs[n]=true;
+  updateBadge(n,true);
+  var now=new Date();
+  document.getElementById('sig-date-'+n).textContent='Signed: '+now.toLocaleString();
+  canvas.classList.add('signed-canvas');
+}
+
+function updateBadge(n,signed){
+  var badge=document.getElementById('badge-'+n);
+  if(!badge) return;
+  badge.textContent=signed?'✓ Signed':'Unsigned';
+  badge.className='doc-badge '+(signed?'signed':'unsigned');
+}
+
+// ---- DOC EXPAND/COLLAPSE ----
+function toggleDoc(n){
+  var header=document.querySelector('#doc-card-'+n+' .doc-header');
+  var body=document.getElementById('doc-body-'+n);
+  var isOpen=body.classList.contains('show');
+  // Close all
+  document.querySelectorAll('.doc-body').forEach(function(b){ b.classList.remove('show'); });
+  document.querySelectorAll('.doc-header').forEach(function(h){ h.classList.remove('open'); });
+  if(!isOpen){
+    body.classList.add('show');
+    header.classList.add('open');
+    setTimeout(function(){
+      header.scrollIntoView({behavior:'smooth',block:'start'});
+    },100);
+  }
+}
+
+// ---- REVIEW ----
+function mask(str,keep){
+  if(!str||str.length<=keep) return str;
+  return str.slice(0,-keep).replace(/./g,'•')+str.slice(-keep);
+}
+
+function populateReview(){
+  var p=document.getElementById('review-personal');
+  var sin=document.getElementById('sin').value;
+  var items=[
+    ['Full Name',document.getElementById('fullName').value],
+    ['Email',document.getElementById('email').value],
+    ['Phone',document.getElementById('phone').value],
+    ['Date of Birth',document.getElementById('dob').value],
+    ['Address',document.getElementById('address').value+', '+document.getElementById('city').value+', '+document.getElementById('province').value+' '+document.getElementById('postal').value],
+    ['SIN',mask(sin,3)],
+    ['Hotel Location',document.getElementById('hotelLocation').value],
+    ['Work Permit',document.getElementById('workPermitCheck').checked?'Yes':'No'],
+  ];
+  p.innerHTML=items.map(function(it){
+    return '<div class="review-item"><div class="lbl">'+it[0]+'</div><div class="val">'+it[1]+'</div></div>';
+  }).join('');
+
+  var b=document.getElementById('review-banking');
+  var acct=document.getElementById('accountNo').value;
+  var bitems=[
+    ['Bank',document.getElementById('bankName').value],
+    ['Institution #',document.getElementById('institutionNo').value],
+    ['Transit #',document.getElementById('transitNo').value],
+    ['Account #',mask(acct,4)],
+    ['Account Type',document.getElementById('accountType').value],
+  ];
+  b.innerHTML=bitems.map(function(it){
+    return '<div class="review-item"><div class="lbl">'+it[0]+'</div><div class="val">'+it[1]+'</div></div>';
+  }).join('');
+
+  var d=document.getElementById('review-docs');
+  d.innerHTML='';
+  for(var i=1;i<=9;i++){
+    var li=document.createElement('li');
+    var signed=signedDocs[i];
+    li.innerHTML='<span class="status-icon">'+(signed?'✅':'❌')+'</span> <strong>'+i+'.</strong> '+DOC_NAMES[i]+' — <em style="color:'+(signed?'var(--success)':'var(--danger)')+'">'+(signed?'Signed':'Not Signed')+'</em>';
+    d.appendChild(li);
+  }
+
+  // Show/hide warning
+  var allSigned=Object.keys(signedDocs).filter(function(k){ return signedDocs[k]; }).length===9;
+  document.getElementById('submit-warning').style.display=allSigned?'none':'block';
+}
+
+// ---- SUBMIT ----
+function submitForm(){
+  var allSigned=true;
+  for(var i=1;i<=9;i++){ if(!signedDocs[i]){ allSigned=false; break; } }
+  if(!allSigned){
+    document.getElementById('submit-warning').style.display='block';
+    alert('Please sign all 9 documents before submitting.');
+    return;
+  }
+
+  var record={
+    id:'DGH-'+Math.floor(Math.random()*900000+100000),
+    submittedAt:new Date().toLocaleString(),
+    name:document.getElementById('fullName').value,
+    email:document.getElementById('email').value,
+    phone:document.getElementById('phone').value,
+    hotelLocation:document.getElementById('hotelLocation').value,
+    docs:{}
+  };
+  for(var j=1;j<=9;j++){ record.docs[j]=signedDocs[j]||false; }
+
+  // Save to localStorage
+  var existing=JSON.parse(localStorage.getItem('dg-hotels-onboarding')||'[]');
+  existing.push(record);
+  localStorage.setItem('dg-hotels-onboarding',JSON.stringify(existing));
+
+  document.getElementById('success-ref').textContent=record.id;
+  document.getElementById('successModal').classList.add('show');
+}
+
+// ---- RESET ----
+function resetForm(){
+  location.reload();
+}
+
+// ---- ADMIN ----
+function openAdmin(){
+  document.getElementById('adminOverlay').classList.add('show');
+  document.getElementById('adminPw').value='';
+  document.getElementById('pw-err').style.display='none';
+  document.getElementById('admin-pw-gate').style.display='block';
+  document.getElementById('admin-content').style.display='none';
+}
+function closeAdmin(){ document.getElementById('adminOverlay').classList.remove('show'); }
+
+function checkAdminPw(){
+  var pw=document.getElementById('adminPw').value;
+  if(pw==='admin123'){
+    document.getElementById('admin-pw-gate').style.display='none';
+    document.getElementById('admin-content').style.display='block';
+    loadAdminTable();
+  } else {
+    document.getElementById('pw-err').style.display='block';
+  }
+}
+
+function loadAdminTable(){
+  var data=JSON.parse(localStorage.getItem('dg-hotels-onboarding')||'[]');
+  var tbody=document.getElementById('adminTableBody');
+  var noRec=document.getElementById('no-records');
+  tbody.innerHTML='';
+  if(data.length===0){ noRec.style.display='block'; return; }
+  noRec.style.display='none';
+  data.forEach(function(r){
+    var tr=document.createElement('tr');
+    var docCells='';
+    for(var i=1;i<=9;i++){
+      docCells+='<td style="text-align:center">'+(r.docs[i]?'<span class="check">✓</span>':'<span class="cross">✗</span>')+'</td>';
+    }
+    tr.innerHTML='<td>'+r.name+'</td><td>'+r.email+'</td><td>'+r.hotelLocation+'</td><td style="white-space:nowrap">'+r.submittedAt+'</td>'+docCells;
+    tbody.appendChild(tr);
+  });
+}
+
+function clearAllData(){
+  if(confirm('Are you sure you want to delete ALL employee submission records? This cannot be undone.')){
+    localStorage.removeItem('dg-hotels-onboarding');
+    loadAdminTable();
+  }
+}
+
+// Close admin on overlay click
+document.getElementById('adminOverlay').addEventListener('click',function(e){
+  if(e.target===this) closeAdmin();
+});
+</script>
+</body>
+</html>
