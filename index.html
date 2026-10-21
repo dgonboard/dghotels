@@ -249,6 +249,14 @@ canvas.sig-pad{
 canvas.sig-pad.signed-canvas{border-color:var(--success)}
 .sig-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .sig-date{font-size:.78rem;color:var(--text-light);margin-left:auto}
+.sig-date-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.sig-date-row label{font-size:.82rem;font-weight:600;color:var(--text-mid);white-space:nowrap}
+.sig-date-row input[type=date]{
+  font-size:15px;padding:7px 10px;border:1.5px solid var(--border);
+  border-radius:6px;outline:none;min-height:40px;
+  background:#fff;color:var(--text-dark);
+}
+.sig-date-row input[type=date]:focus{border-color:var(--ci-orange);}
 
 /* ===== REVIEW STEP ===== */
 .review-section{
@@ -372,10 +380,10 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
 <!-- ===== PROGRESS ===== -->
 <div class="progress-wrap">
   <div class="progress-inner">
-    <div class="step-pill active" id="pill-1">1. Personal Info</div>
-    <div class="step-pill" id="pill-2">2. Banking</div>
-    <div class="step-pill" id="pill-3">3. Documents</div>
-    <div class="step-pill" id="pill-4">4. Review &amp; Submit</div>
+    <div class="step-pill active" id="pill-1" onclick="jumpTo(1)" style="cursor:pointer">1. Personal Info</div>
+    <div class="step-pill" id="pill-2" onclick="jumpTo(2)" style="cursor:pointer">2. Banking</div>
+    <div class="step-pill" id="pill-3" onclick="jumpTo(3)" style="cursor:pointer">3. Documents</div>
+    <div class="step-pill" id="pill-4" onclick="jumpTo(4)" style="cursor:pointer">4. Review &amp; Submit</div>
   </div>
 </div>
 
@@ -1266,8 +1274,8 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
       <ul class="doc-status-list" id="review-docs"></ul>
     </div>
 
-    <div id="submit-warning" style="display:none;background:#fff3cd;border:1.5px solid #ffc107;border-radius:8px;padding:12px;margin-bottom:14px;font-size:.85rem;color:#856404">
-      ⚠️ Please sign all 9 documents before submitting.
+    <div id="submit-warning" style="display:none;background:#fff3cd;border:1.5px solid #ffc107;border-radius:8px;padding:12px;margin-bottom:14px;font-size:.85rem;color:#856404;line-height:1.7">
+      ⚠️ Please complete the following before submitting.
     </div>
 
     <div class="nav-btns">
@@ -1367,21 +1375,16 @@ function showStep(n) {
 }
 
 function nextStep(from) {
-  if(from === 1 && !validateStep1()) return;
-  if(from === 2 && !validateStep2()) return;
-  if(from === 3) {
-    var missing = [];
-    for(var i=1;i<=9;i++){ if(!signedDocs[i]) missing.push(i); }
-    if(missing.length > 0){
-      alert('Please sign all 9 documents before proceeding. Missing: Document(s) '+missing.join(', '));
-      return;
-    }
-  }
   if(from === 3) populateReview();
   showStep(from+1);
 }
 
 function prevStep(from){ showStep(from-1); }
+
+function jumpTo(n){
+  if(n === 4) populateReview();
+  showStep(n);
+}
 
 // ---- VALIDATION ----
 function validateStep1(){
@@ -1447,8 +1450,23 @@ document.addEventListener('DOMContentLoaded', function(){
   upd('institutionNo','diag-inst');
   upd('accountNo','diag-acct');
 
-  // Init signature pads
-  for(var i=1;i<=9;i++){ initSigPad(i); }
+  // Today's date in YYYY-MM-DD for date inputs
+  var today = new Date();
+  var todayStr = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+
+  // Inject date field into each sig section and init pads
+  for(var i=1;i<=9;i++){
+    var controls = document.querySelector('#sig-'+i).closest('.sig-section').querySelector('.sig-controls');
+    if(controls){
+      var dateRow = document.createElement('div');
+      dateRow.className = 'sig-date-row';
+      dateRow.style.width = '100%';
+      dateRow.style.marginTop = '8px';
+      dateRow.innerHTML = '<label for="sig-datepicker-'+i+'">📅 Date Signed:</label><input type="date" id="sig-datepicker-'+i+'" value="'+todayStr+'">';
+      controls.parentNode.insertBefore(dateRow, controls.nextSibling);
+    }
+    initSigPad(i);
+  }
 });
 
 // ---- SIGNATURE PADS ----
@@ -1516,6 +1534,12 @@ function clearSig(n){
   updateBadge(n,false);
   document.getElementById('sig-date-'+n).textContent='';
   canvas.classList.remove('signed-canvas');
+  // Reset date picker to today
+  var dp=document.getElementById('sig-datepicker-'+n);
+  if(dp){
+    var t=new Date();
+    dp.value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+  }
 }
 
 function acceptSig(n){
@@ -1529,8 +1553,10 @@ function acceptSig(n){
 
   signedDocs[n]=true;
   updateBadge(n,true);
-  var now=new Date();
-  document.getElementById('sig-date-'+n).textContent='Signed: '+now.toLocaleString();
+  var datePicker=document.getElementById('sig-datepicker-'+n);
+  var dateVal=datePicker?datePicker.value:'';
+  var displayDate=dateVal?new Date(dateVal+'T00:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}):new Date().toLocaleDateString();
+  document.getElementById('sig-date-'+n).textContent='Signed: '+displayDate;
   canvas.classList.add('signed-canvas');
 }
 
@@ -1610,13 +1636,34 @@ function populateReview(){
 
 // ---- SUBMIT ----
 function submitForm(){
-  var allSigned=true;
-  for(var i=1;i<=9;i++){ if(!signedDocs[i]){ allSigned=false; break; } }
-  if(!allSigned){
+  var errors = [];
+
+  // Check Step 1 fields
+  if(!document.getElementById('fullName').value.trim()) errors.push('Full name (Step 1)');
+  if(!document.getElementById('phone').value.trim()) errors.push('Phone number (Step 1)');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('email').value)) errors.push('Valid email (Step 1)');
+  if(!document.getElementById('dob').value.trim()) errors.push('Date of birth (Step 1)');
+  if(!/^\d{9}$/.test(document.getElementById('sin').value.trim())) errors.push('9-digit SIN (Step 1)');
+
+  // Check Step 2 fields
+  if(!document.getElementById('bankName').value.trim()) errors.push('Bank name (Step 2)');
+  if(!/^\d{3}$/.test(document.getElementById('institutionNo').value.trim())) errors.push('3-digit institution number (Step 2)');
+  if(!/^\d{5}$/.test(document.getElementById('transitNo').value.trim())) errors.push('5-digit transit number (Step 2)');
+  if(!document.getElementById('accountNo').value.trim()) errors.push('Account number (Step 2)');
+
+  // Check all 9 docs signed
+  var unsignedDocs = [];
+  for(var i=1;i<=9;i++){ if(!signedDocs[i]) unsignedDocs.push(DOC_NAMES[i]); }
+  if(unsignedDocs.length > 0) errors.push('Unsigned documents: '+unsignedDocs.join(', '));
+
+  if(errors.length > 0){
     document.getElementById('submit-warning').style.display='block';
-    alert('Please sign all 9 documents before submitting.');
+    document.getElementById('submit-warning').innerHTML='⚠️ Please complete the following before submitting:<br><br>• '+errors.join('<br>• ');
+    window.scrollTo({top:document.getElementById('submit-warning').offsetTop-20,behavior:'smooth'});
     return;
   }
+
+  document.getElementById('submit-warning').style.display='none';
 
   var record={
     id:'DGH-'+Math.floor(Math.random()*900000+100000),
