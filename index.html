@@ -470,35 +470,51 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
       <input type="hidden" id="hotelLocation" value="Comfort Inn &amp; Suites Bradford, ON">
     </div>
 
-    <!-- Work Permit -->
+    <!-- Work Entitlement -->
     <div class="checkbox-row">
-      <input type="checkbox" id="workPermitCheck" onchange="toggleWorkPermit()">
-      <label for="workPermitCheck">I am legally entitled to work in Canada (I hold a work permit / study permit)</label>
+      <input type="checkbox" id="workEntitledCheck" onchange="toggleWorkEntitled()">
+      <label for="workEntitledCheck">I am legally entitled to work in Canada</label>
     </div>
-    <div class="conditional-block" id="workPermitBlock">
-      <div class="form-row cols-2">
-        <div class="form-group">
-          <label for="permitNumber">Permit Number *</label>
-          <input type="text" id="permitNumber" placeholder="e.g. A123456789">
-        </div>
-        <div class="form-group">
-          <label for="permitExpiry">Permit Expiry Date *</label>
-          <input type="text" id="permitExpiry" placeholder="DD/MM/YYYY">
-        </div>
+
+    <!-- Second question — only shows after first is checked -->
+    <div class="conditional-block" id="workPermitQuestion">
+      <div class="checkbox-row" style="padding:0 0 8px">
+        <input type="checkbox" id="workPermitCheck" onchange="toggleWorkPermit()">
+        <label for="workPermitCheck">I hold a work permit or study permit</label>
       </div>
-      <div class="form-row cols-2">
-        <div class="form-group">
-          <label>Does your study permit qualify you to work off campus?</label>
-          <select id="offCampus">
-            <option value="">Select…</option>
-            <option>Yes</option>
-            <option>No</option>
-            <option>N/A – Work Permit</option>
-          </select>
+
+      <!-- Permit details — only show if they have a permit -->
+      <div class="conditional-block" id="workPermitBlock" style="margin-top:4px">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label for="permitNumber">Permit Number *</label>
+            <input type="text" id="permitNumber" placeholder="e.g. A123456789">
+          </div>
+          <div class="form-group">
+            <label for="permitExpiry">Permit Expiry Date *</label>
+            <input type="text" id="permitExpiry" placeholder="DD/MM/YYYY">
+          </div>
         </div>
-        <div class="form-group">
-          <label for="hoursEntitled">If yes, hours entitled to work per week</label>
-          <input type="number" id="hoursEntitled" placeholder="e.g. 20" min="0" max="168">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label>Does your study permit qualify you to work off campus?</label>
+            <select id="offCampus">
+              <option value="">Select…</option>
+              <option>Yes</option>
+              <option>No</option>
+              <option>N/A – Work Permit</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="hoursEntitled">If yes, hours entitled to work per week</label>
+            <input type="number" id="hoursEntitled" placeholder="e.g. 20" min="0" max="168">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:10px">
+          <label for="permitUpload">Upload Permit Document (PDF or image) *</label>
+          <input type="file" id="permitUpload" accept=".pdf,.jpg,.jpeg,.png" onchange="handlePermitUpload(this)"
+            style="font-size:15px;padding:8px;border:1.5px dashed #aaa;border-radius:8px;background:#fafafa;min-height:48px;cursor:pointer;width:100%">
+          <span class="hint" id="permit-upload-status"></span>
         </div>
       </div>
     </div>
@@ -776,88 +792,70 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
     </div>
   </div>
 
-  <!-- ---- DOC 3: TD1 Tax Form ---- -->
+  <!-- ---- DOC 3: TD1 Tax Form 2025 ---- -->
   <div class="doc-card" id="doc-card-3">
     <div class="doc-header" onclick="toggleDoc(3)">
       <div class="doc-num">3</div>
-      <div class="doc-title">TD1 – 2021 Personal Tax Credits Return</div>
+      <div class="doc-title">TD1 – 2025 Personal Tax Credits Return (Official CRA Form)</div>
       <span class="doc-badge unsigned" id="badge-3">Unsigned</span>
       <span class="doc-chevron">▼</span>
     </div>
     <div class="doc-body" id="doc-body-3">
-      <div class="policy-doc">
-        <h2>2021 Personal Tax Credits Return — TD1</h2>
-        <p style="font-size:.8rem;color:#777;text-align:center">Protected B when completed — Canada Revenue Agency</p>
-        <p>Read page 2 before filling out this form. Your employer or payer will use this form to determine the amount of your tax deductions. Fill out this form based on the best estimate of your circumstances.</p>
-        <p>If you do not fill out this form, your tax deductions will only include the basic personal amount, estimated by your employer or payer based on the income they pay you.</p>
+
+      <!-- Step-by-step instructions -->
+      <div style="background:#eaebf7;border:1.5px solid var(--ci-navy);border-radius:8px;padding:16px;margin-bottom:16px;font-size:.88rem;line-height:1.7">
+        <strong style="color:var(--ci-navy);font-size:.95rem">📋 How to complete your TD1:</strong>
+        <ol style="padding-left:18px;margin-top:8px">
+          <li><strong>Download</strong> the official 2025 fillable PDF using the button below.</li>
+          <li><strong>Fill it in</strong> using Adobe Acrobat Reader (free) or your browser's PDF viewer.</li>
+          <li><strong>Save the completed PDF</strong> to your device.</li>
+          <li><strong>Upload it below</strong> so it's attached to your onboarding record.</li>
+          <li><strong>Sign below</strong> to certify the information is correct.</li>
+        </ol>
+        <p style="margin-top:8px;color:#555;font-size:.8rem">⚠️ Both the Federal TD1 and Ontario TD1ON are required. Download both.</p>
       </div>
 
-      <div class="doc-form-section">
-        <div class="section-label">Employee Information</div>
-        <div class="form-row cols-2">
-          <div class="form-group"><label>Last Name</label><input type="text" id="td1-lastname" placeholder="Last name"></div>
-          <div class="form-group"><label>First Name and Initial(s)</label><input type="text" id="td1-firstname" placeholder="First name and initial(s)"></div>
-        </div>
-        <div class="form-row cols-3">
-          <div class="form-group"><label>Date of Birth (YYYY/MM/DD)</label><input type="text" id="td1-dob" placeholder="YYYY/MM/DD" maxlength="10"></div>
-          <div class="form-group"><label>Employee Number (if assigned)</label><input type="text" id="td1-empno" placeholder="Optional"></div>
-          <div class="form-group"><label>Social Insurance Number</label><input type="text" id="td1-sin" placeholder="9 digits" maxlength="9" inputmode="numeric"></div>
-        </div>
-        <div class="form-row cols-2">
-          <div class="form-group"><label>Address</label><input type="text" id="td1-address" placeholder="Street address"></div>
-          <div class="form-group"><label>Postal Code</label><input type="text" id="td1-postal" placeholder="A1A 1A1" maxlength="7"></div>
-        </div>
-        <div class="form-row cols-1">
-          <div class="form-group"><label>For non-residents only – Country of permanent residence</label><input type="text" id="td1-country" placeholder="Leave blank if Canadian resident"></div>
-        </div>
+      <!-- Download buttons -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+        <a href="https://www.canada.ca/content/dam/cra-arc/formspubs/td1-fill-25e.pdf" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:var(--ci-orange);color:#fff;border-radius:8px;font-weight:700;font-size:.9rem;text-decoration:none;min-height:48px">
+          ⬇️ Download Federal TD1 2025
+        </a>
+        <a href="https://www.canada.ca/content/dam/cra-arc/formspubs/td1on-fill-25e.pdf" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:var(--ci-navy);color:#fff;border-radius:8px;font-weight:700;font-size:.9rem;text-decoration:none;min-height:48px">
+          ⬇️ Download Ontario TD1ON 2025
+        </a>
       </div>
 
-      <div class="doc-form-section">
-        <div class="section-label">Tax Credit Lines</div>
-        <table class="td1-table">
-          <tr><td><span class="td1-line-num">1.</span> <strong>Basic personal amount</strong> – Every resident of Canada can enter a basic personal amount of $13,808. If your net income from all sources will be greater than $151,978, you may calculate a partial claim using Form TD1-WS.</td>
-            <td><input type="text" id="td1-l1" value="13808.00" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">2.</span> <strong>Canada caregiver amount for infirm children under age 18</strong> – Either parent (but not both), may claim $2,295 for each infirm child born in 2004 or later that resides with both parents throughout the year.</td>
-            <td><input type="text" id="td1-l2" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">3.</span> <strong>Age amount</strong> – If you will be 65 or older on December 31, 2021, and your net income for the year from all sources will be $38,893 or less, enter $7,713.</td>
-            <td><input type="text" id="td1-l3" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">4.</span> <strong>Pension income amount</strong> – If you will receive regular pension payments (excluding CPP, QPP, OAS, or GIS), enter $2,000 or your estimated annual pension income, whichever is less.</td>
-            <td><input type="text" id="td1-l4" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">5.</span> <strong>Tuition (full time and part time)</strong> – If you are a student paying more than $100 in tuition fees, enter the total tuition fees you will pay.</td>
-            <td><input type="text" id="td1-l5" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">6.</span> <strong>Disability amount</strong> – If you will claim the disability amount using Form T2201, enter $8,662.</td>
-            <td><input type="text" id="td1-l6" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">7.</span> <strong>Spouse or common-law partner amount</strong> – If you are supporting a spouse or common-law partner whose net income will be less than Line 1, enter the difference.</td>
-            <td><input type="text" id="td1-l7" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">8.</span> <strong>Amount for an eligible dependant</strong> – If you do not have a spouse or common-law partner and you support a dependent relative, enter the applicable amount.</td>
-            <td><input type="text" id="td1-l8" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">9.</span> <strong>Canada caregiver amount for eligible dependant or spouse/common-law partner</strong> – See Form TD1-WS if applicable.</td>
-            <td><input type="text" id="td1-l9" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">10.</span> <strong>Canada caregiver amount for dependant(s) age 18 or older</strong> – If you support an infirm dependant age 18 or older whose net income will be $17,256 or less, enter $7,348.</td>
-            <td><input type="text" id="td1-l10" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">11.</span> <strong>Amounts transferred from your spouse or common-law partner</strong> – Unused age amount, pension income amount, tuition amount, or disability amount.</td>
-            <td><input type="text" id="td1-l11" placeholder="$"></td></tr>
-          <tr><td><span class="td1-line-num">12.</span> <strong>Amounts transferred from a dependant</strong> – Unused disability amount or tuition amount from your dependant.</td>
-            <td><input type="text" id="td1-l12" placeholder="$"></td></tr>
-          <tr style="background:#fff8e1"><td><span class="td1-line-num">13.</span> <strong>TOTAL CLAIM AMOUNT</strong> – Add Lines 1 to 12. Your employer will use this to determine your tax deductions.</td>
-            <td><input type="text" id="td1-l13" placeholder="$ Total" style="font-weight:700;background:#fffde7"></td></tr>
-        </table>
+      <!-- PDF Embed attempt (works if browser supports it) -->
+      <div style="margin-bottom:16px">
+        <p style="font-size:.82rem;font-weight:600;color:var(--text-mid);margin-bottom:8px">📄 Preview (Federal TD1 — fill directly in browser if supported, otherwise download above):</p>
+        <iframe
+          src="https://www.canada.ca/content/dam/cra-arc/formspubs/td1-fill-25e.pdf"
+          width="100%" height="700px"
+          style="border:1.5px solid #ccc;border-radius:8px;display:block"
+          title="2025 Federal TD1 Fillable PDF">
+          <p style="padding:16px;color:#666">Your browser cannot display the PDF inline. Please use the download button above.</p>
+        </iframe>
+      </div>
 
+      <!-- Upload completed PDFs -->
+      <div class="doc-form-section">
+        <div class="section-label">📎 Upload Your Completed TD1 Forms</div>
+        <p style="font-size:.82rem;color:#666;margin-bottom:12px">After filling and saving both forms, upload them here. Both files will be saved with your onboarding record.</p>
         <div class="form-row cols-2">
           <div class="form-group">
-            <label><input type="checkbox" id="td1-multiemployer" style="margin-right:6px"> More than one employer / payer (enter "0" on Line 13)</label>
+            <label for="td1-federal-upload">Federal TD1 (completed PDF)</label>
+            <input type="file" id="td1-federal-upload" accept=".pdf" onchange="handleTd1Upload(this,'federal')"
+              style="font-size:15px;padding:8px;border:1.5px dashed #aaa;border-radius:8px;background:#fafafa;min-height:48px;cursor:pointer">
+            <span class="hint" id="td1-federal-status"></span>
           </div>
           <div class="form-group">
-            <label><input type="checkbox" id="td1-incomelow" style="margin-right:6px"> Total income less than total claim amount</label>
+            <label for="td1-ontario-upload">Ontario TD1ON (completed PDF)</label>
+            <input type="file" id="td1-ontario-upload" accept=".pdf" onchange="handleTd1Upload(this,'ontario')"
+              style="font-size:15px;padding:8px;border:1.5px dashed #aaa;border-radius:8px;background:#fafafa;min-height:48px;cursor:pointer">
+            <span class="hint" id="td1-ontario-status"></span>
           </div>
-        </div>
-        <div class="form-group" style="margin-top:10px">
-          <label>Additional tax to be deducted (per payment period)</label>
-          <input type="text" id="td1-addl" placeholder="$ 0.00" style="max-width:200px">
-        </div>
-        <div class="form-group" style="margin-top:10px">
-          <label>Deduction for living in a prescribed northern zone (if applicable)</label>
-          <input type="text" id="td1-zone" placeholder="$ 0.00" style="max-width:200px">
         </div>
       </div>
 
@@ -1304,8 +1302,37 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
         <div class="err" id="pw-err">Incorrect password. Please try again.</div>
       </div>
       <div id="admin-content" style="display:none">
+
+        <!-- Google Sheets Setup Instructions -->
+        <div style="background:#eaebf7;border:1.5px solid var(--ci-navy);border-radius:8px;padding:16px;margin-bottom:20px;font-size:.83rem;line-height:1.7">
+          <strong style="font-size:.95rem;color:var(--ci-navy)">📊 Connect Google Sheets (one-time setup)</strong>
+          <ol style="padding-left:18px;margin-top:8px;color:#333">
+            <li>Go to <a href="https://sheets.google.com" target="_blank" style="color:var(--ci-orange)">sheets.google.com</a> → create a new spreadsheet named <strong>DG Hotels Onboarding</strong></li>
+            <li>Click <strong>Extensions → Apps Script</strong></li>
+            <li>Delete any existing code and paste in this script:<br>
+              <textarea readonly onclick="this.select()" style="width:100%;height:130px;font-size:.72rem;font-family:monospace;padding:8px;border:1px solid #ccc;border-radius:4px;margin-top:4px;background:#fff;resize:none">function doPost(e){
+  try{
+    var sheet=SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    if(sheet.getLastRow()===0){
+      sheet.appendRow(['Ref ID','Submitted','Name','Email','Phone','Location','TD1 Federal','TD1 Ontario','D1','D2','D3','D4','D5','D6','D7','D8','D9']);
+    }
+    var d=JSON.parse(e.postData.contents);
+    sheet.appendRow([d.id,d.submittedAt,d.name,d.email,d.phone,d.hotelLocation,d.td1Federal,d.td1Ontario,d.d1,d.d2,d.d3,d.d4,d.d5,d.d6,d.d7,d.d8,d.d9]);
+    return ContentService.createTextOutput(JSON.stringify({status:'ok'})).setMimeType(ContentService.MimeType.JSON);
+  }catch(err){
+    return ContentService.createTextOutput(JSON.stringify({status:'error',message:err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}</textarea>
+            </li>
+            <li>Click <strong>Deploy → New deployment → Web app</strong></li>
+            <li>Set <em>"Who has access"</em> to <strong>Anyone</strong> → click <strong>Deploy</strong> → copy the Web App URL</li>
+            <li>Open <code>dg-hotels-onboarding.html</code> in a text editor, find <code>YOUR_GOOGLE_APPS_SCRIPT_URL_HERE</code> and replace it with your copied URL → save &amp; re-upload to GitHub</li>
+          </ol>
+          <p style="margin-top:8px;color:#666">After setup, every submission will automatically appear as a new row in your Google Sheet. ✅</p>
+        </div>
+
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
-          <h3 style="color:var(--dg-green)">Employee Submissions</h3>
+          <h3 style="color:var(--dg-green)">Employee Submissions (Local)</h3>
           <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑 Clear All Data</button>
         </div>
         <div class="admin-table-wrap">
@@ -1316,6 +1343,7 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
                 <th>Email</th>
                 <th>Hotel Location</th>
                 <th>Submitted</th>
+                <th>TD1 Files</th>
                 <th>D1</th><th>D2</th><th>D3</th><th>D4</th><th>D5</th><th>D6</th><th>D7</th><th>D8</th><th>D9</th>
               </tr>
             </thead>
@@ -1431,10 +1459,42 @@ function toggleSin(){
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
-// ---- WORK PERMIT ----
+// ---- WORK ENTITLEMENT ----
+function toggleWorkEntitled(){
+  var q = document.getElementById('workPermitQuestion');
+  var entitled = document.getElementById('workEntitledCheck').checked;
+  q.classList.toggle('show', entitled);
+  // Reset the permit checkbox if unchecked
+  if(!entitled){
+    document.getElementById('workPermitCheck').checked = false;
+    document.getElementById('workPermitBlock').classList.remove('show');
+  }
+}
+
 function toggleWorkPermit(){
   var block = document.getElementById('workPermitBlock');
   block.classList.toggle('show', document.getElementById('workPermitCheck').checked);
+}
+
+// ---- PERMIT FILE UPLOAD ----
+var permitFile = null;
+function handlePermitUpload(input){
+  var file = input.files[0];
+  var status = document.getElementById('permit-upload-status');
+  if(!file) return;
+  if(file.size > 10 * 1024 * 1024){
+    status.textContent = '⚠️ File too large (max 10MB).';
+    status.style.color = 'var(--danger)';
+    input.value = '';
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    permitFile = {name: file.name, size: file.size, data: e.target.result};
+    status.textContent = '✅ ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB) — uploaded';
+    status.style.color = 'var(--success)';
+  };
+  reader.readAsDataURL(file);
 }
 
 // ---- CHEQUE DIAGRAM LIVE UPDATE ----
@@ -1601,7 +1661,8 @@ function populateReview(){
     ['Address',document.getElementById('address').value+', '+document.getElementById('city').value+', '+document.getElementById('province').value+' '+document.getElementById('postal').value],
     ['SIN',mask(sin,3)],
     ['Hotel Location',document.getElementById('hotelLocation').value],
-    ['Work Permit',document.getElementById('workPermitCheck').checked?'Yes':'No'],
+    ['Entitled to Work in Canada',document.getElementById('workEntitledCheck').checked?'Yes':'No'],
+    ['Holds Work/Study Permit',document.getElementById('workPermitCheck').checked?'Yes — '+document.getElementById('permitNumber').value:'No'],
   ];
   p.innerHTML=items.map(function(it){
     return '<div class="review-item"><div class="lbl">'+it[0]+'</div><div class="val">'+it[1]+'</div></div>';
@@ -1672,6 +1733,8 @@ function submitForm(){
     email:document.getElementById('email').value,
     phone:document.getElementById('phone').value,
     hotelLocation:document.getElementById('hotelLocation').value,
+    td1Federal: td1Files.federal ? td1Files.federal.name : '—',
+    td1Ontario: td1Files.ontario ? td1Files.ontario.name : '—',
     docs:{}
   };
   for(var j=1;j<=9;j++){ record.docs[j]=signedDocs[j]||false; }
@@ -1680,6 +1743,89 @@ function submitForm(){
   var existing=JSON.parse(localStorage.getItem('dg-hotels-onboarding')||'[]');
   existing.push(record);
   localStorage.setItem('dg-hotels-onboarding',JSON.stringify(existing));
+
+  // Build email body
+  var docLines='';
+  for(var k=1;k<=9;k++){
+    docLines+='\n  '+(record.docs[k]?'✅':'❌')+' '+DOC_NAMES[k];
+  }
+
+  var emailSubject='New Employee Onboarding – '+record.name+' ('+record.id+')';
+  var emailBody=
+'New Employee Onboarding Submission\n'+
+'Reference: '+record.id+'\n'+
+'Submitted: '+record.submittedAt+'\n'+
+'\n━━━━━━━━━━━━━━━━━━━━━━━━\n'+
+'PERSONAL INFORMATION\n'+
+'━━━━━━━━━━━━━━━━━━━━━━━━\n'+
+'Name:          '+record.name+'\n'+
+'Email:         '+record.email+'\n'+
+'Phone:         '+record.phone+'\n'+
+'Location:      '+record.hotelLocation+'\n'+
+'Work Entitled: '+(document.getElementById('workEntitledCheck').checked?'Yes':'No')+'\n'+
+'Work Permit:   '+(document.getElementById('workPermitCheck').checked?'Yes – '+document.getElementById('permitNumber').value+' (Exp: '+document.getElementById('permitExpiry').value+')':'No')+'\n'+
+'Permit File:   '+(permitFile?permitFile.name:'N/A')+'\n'+
+'\n━━━━━━━━━━━━━━━━━━━━━━━━\n'+
+'BANKING INFORMATION\n'+
+'━━━━━━━━━━━━━━━━━━━━━━━━\n'+
+'Bank:          '+document.getElementById('bankName').value+'\n'+
+'Institution #: '+document.getElementById('institutionNo').value+'\n'+
+'Transit #:     '+document.getElementById('transitNo').value+'\n'+
+'Account #:     ****'+document.getElementById('accountNo').value.slice(-4)+'\n'+
+'Account Type:  '+document.getElementById('accountType').value+'\n'+
+'\n━━━━━━━━━━━━━━━━━━━━━━━━\n'+
+'TD1 FILES UPLOADED\n'+
+'━━━━━━━━━━━━━━━━━━━━━━━━\n'+
+'Federal TD1:   '+(td1Files.federal?td1Files.federal.name:'Not uploaded')+'\n'+
+'Ontario TD1ON: '+(td1Files.ontario?td1Files.ontario.name:'Not uploaded')+'\n'+
+'\n━━━━━━━━━━━━━━━━━━━━━━━━\n'+
+'DOCUMENT SIGNING STATUS\n'+
+'━━━━━━━━━━━━━━━━━━━━━━━━'+
+docLines+'\n'+
+'\n━━━━━━━━━━━━━━━━━━━━━━━━\n'+
+'All documents signed and submitted via the DG Hotels onboarding portal.\n'+
+'Please retain this email for your records.';
+
+  // ---- GOOGLE SHEETS via Apps Script ----
+  // SETUP: Replace the URL below with your Google Apps Script Web App URL
+  // See instructions in the Admin Portal once deployed
+  var SHEETS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
+  if(SHEETS_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'){
+    var sheetsData = {
+      id: record.id,
+      submittedAt: record.submittedAt,
+      name: record.name,
+      email: record.email,
+      phone: record.phone,
+      hotelLocation: record.hotelLocation,
+      td1Federal: record.td1Federal,
+      td1Ontario: record.td1Ontario,
+      d1: record.docs[1]?'Signed':'Unsigned',
+      d2: record.docs[2]?'Signed':'Unsigned',
+      d3: record.docs[3]?'Signed':'Unsigned',
+      d4: record.docs[4]?'Signed':'Unsigned',
+      d5: record.docs[5]?'Signed':'Unsigned',
+      d6: record.docs[6]?'Signed':'Unsigned',
+      d7: record.docs[7]?'Signed':'Unsigned',
+      d8: record.docs[8]?'Signed':'Unsigned',
+      d9: record.docs[9]?'Signed':'Unsigned'
+    };
+    fetch(SHEETS_URL, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(sheetsData)
+    }).catch(function(err){ console.warn('Sheets sync failed:',err); });
+  }
+
+  // ---- EMAIL via mailto ----
+  var mailtoLink='mailto:cnb27@stayatchoice.com'+
+    '?subject='+encodeURIComponent(emailSubject)+
+    '&body='+encodeURIComponent(emailBody);
+
+  // Open email after short delay (so Sheets fetch can start)
+  setTimeout(function(){ window.location.href=mailtoLink; }, 400);
 
   document.getElementById('success-ref').textContent=record.id;
   document.getElementById('successModal').classList.add('show');
@@ -1724,7 +1870,8 @@ function loadAdminTable(){
     for(var i=1;i<=9;i++){
       docCells+='<td style="text-align:center">'+(r.docs[i]?'<span class="check">✓</span>':'<span class="cross">✗</span>')+'</td>';
     }
-    tr.innerHTML='<td>'+r.name+'</td><td>'+r.email+'</td><td>'+r.hotelLocation+'</td><td style="white-space:nowrap">'+r.submittedAt+'</td>'+docCells;
+    var td1Cell='<td style="font-size:.75rem">'+(r.td1Federal||'—')+'<br>'+(r.td1Ontario||'—')+'</td>';
+    tr.innerHTML='<td>'+r.name+'</td><td>'+r.email+'</td><td>'+r.hotelLocation+'</td><td style="white-space:nowrap">'+r.submittedAt+'</td>'+td1Cell+docCells;
     tbody.appendChild(tr);
   });
 }
@@ -1740,6 +1887,27 @@ function clearAllData(){
 document.getElementById('adminOverlay').addEventListener('click',function(e){
   if(e.target===this) closeAdmin();
 });
+
+// ---- TD1 FILE UPLOAD ----
+var td1Files = {federal: null, ontario: null};
+function handleTd1Upload(input, type){
+  var file = input.files[0];
+  if(!file) return;
+  var statusEl = document.getElementById('td1-'+type+'-status');
+  if(file.size > 5 * 1024 * 1024){
+    statusEl.textContent = '⚠️ File too large (max 5MB). Please compress and re-upload.';
+    statusEl.style.color = 'var(--danger)';
+    input.value = '';
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    td1Files[type] = {name: file.name, size: file.size, data: e.target.result};
+    statusEl.textContent = '✅ ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB) — uploaded';
+    statusEl.style.color = 'var(--success)';
+  };
+  reader.readAsDataURL(file);
+}
 </script>
 </body>
 </html>
