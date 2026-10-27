@@ -1333,11 +1333,13 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
     var parent=pIter.hasNext()?pIter.next():root.createFolder('DG Hotels Onboarding');
     var folderName=d.name+' – '+d.submittedAt.substring(0,10)+' – '+d.id;
     var empFolder=parent.createFolder(folderName);
-    // 3. Save signed package PDF (all documents + signatures + dates — opens natively in Drive)
+    // 3. Save signed package — PDF if available (opens natively in Drive), else HTML fallback
     if(d.signedPackagePdf){
       var pdfBytes=Utilities.base64Decode(d.signedPackagePdf);
-      var pdfBlob=Utilities.newBlob(pdfBytes,'application/pdf','Signed Onboarding Package – '+d.name+'.pdf');
-      empFolder.createFile(pdfBlob);
+      empFolder.createFile(Utilities.newBlob(pdfBytes,'application/pdf','Signed Onboarding Package – '+d.name+'.pdf'));
+    } else if(d.signedPackageHtml){
+      var htmlBytes=Utilities.base64Decode(d.signedPackageHtml);
+      empFolder.createFile(Utilities.newBlob(htmlBytes,'text/html','Signed Onboarding Package – '+d.name+'.html'));
     }
     // 4. Save uploaded files (TD1s, work permit)
     if(d.files){
@@ -1909,10 +1911,49 @@ function submitForm(){
 
         return doc.output('datauristring').split(',')[1];
       } catch(pdfErr){
-        console.warn('PDF generation failed:', pdfErr);
+        console.warn('PDF generation failed, using HTML fallback:', pdfErr);
         return null;
       }
     })();
+
+    // ── Fallback: if PDF failed (e.g. CDN not loaded), build a clean HTML blob ─
+    var fallbackHtml = null;
+    if(!pdfB64){
+      var fCss='body{font-family:Arial,sans-serif;color:#222;max-width:860px;margin:0 auto;padding:30px}'+
+        'h1{color:#2D3280}h2{color:#2D3280;font-size:1rem;background:#eaebf7;padding:8px 12px;border-radius:4px}'+
+        'h3{color:#2D3280;font-size:.9rem}p{font-size:.85rem;line-height:1.6;margin:.4em 0}'+
+        '.sig-box{background:#fff5e6;border:2px solid #F7941D;border-radius:6px;padding:14px;margin-top:12px}'+
+        'img{display:block;max-width:380px;border:1px solid #ccc;border-radius:4px;margin:8px 0}'+
+        '.meta{color:#555;font-size:.85rem;margin-bottom:24px}';
+      var fHtml='<!DOCTYPE html><html><head><meta charset="utf-8">'+
+        '<title>Signed Onboarding Package – '+record.name+'</title>'+
+        '<style>'+fCss+'</style></head><body>'+
+        '<h1>Comfort Inn &amp; Suites Bradford — DG Hotels</h1>'+
+        '<div class="meta">Employee: <strong>'+record.name+'</strong> | Email: '+record.email+
+        ' | Phone: '+record.phone+'<br>Submitted: '+record.submittedAt+' | Reference: '+record.id+'</div>';
+      for(var fi=1;fi<=9;fi++){
+        var fCard=document.getElementById('doc-card-'+fi);
+        var fTxt='';
+        if(fCard){
+          fCard.querySelectorAll('.section').forEach(function(sec){
+            var h=sec.querySelector('h3');
+            if(h) fTxt+='<h3>'+h.innerHTML+'</h3>';
+            sec.querySelectorAll('p').forEach(function(p){fTxt+='<p>'+p.innerHTML+'</p>';});
+          });
+          if(!fTxt) fCard.querySelectorAll('p').forEach(function(p){
+            if(!p.closest('.sig-section')) fTxt+='<p>'+p.innerHTML+'</p>';
+          });
+        }
+        var fDs=sigDates['sig'+fi]?new Date(sigDates['sig'+fi]+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}):'N/A';
+        var fImg=sigs['sig'+fi]?'<img src="'+sigs['sig'+fi]+'" alt="Signature">':'<p><em>No signature captured.</em></p>';
+        fHtml+='<h2>'+fi+'. '+DOC_NAMES[fi]+'</h2>'+(fTxt||'')+
+          '<div class="sig-box"><strong>Employee Signature:</strong>'+fImg+
+          '<p><strong>Date Signed:</strong> '+fDs+'</p>'+
+          '<p><strong>Employee:</strong> '+record.name+' | <strong>Ref:</strong> '+record.id+'</p></div>';
+      }
+      fHtml+='</body></html>';
+      fallbackHtml = btoa(unescape(encodeURIComponent(fHtml)));
+    }
 
     var sheetsData = {
       id: record.id,
@@ -1933,8 +1974,9 @@ function submitForm(){
       d8: record.docs[8]?'Signed':'Unsigned',
       d9: record.docs[9]?'Signed':'Unsigned',
       signatureDates: sigDates,
-      // Signed package as PDF — opens natively in Google Drive
+      // Signed package — PDF preferred (opens natively in Drive), HTML fallback if PDF unavailable
       signedPackagePdf: pdfB64,
+      signedPackageHtml: fallbackHtml,
       // Uploaded file data
       files: {
         td1Federal:  td1Files.federal  ? {name: td1Files.federal.name,  data: td1Files.federal.data}  : null,
