@@ -1325,25 +1325,26 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
     var d=JSON.parse(e.postData.contents);
     // 1. Log row to Google Sheet
     var sheet=SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    if(sheet.getLastRow()===0){
-      sheet.appendRow(['Ref ID','Submitted','Name','Email','Phone','Location','TD1 Federal','TD1 Ontario','D1','D2','D3','D4','D5','D6','D7','D8','D9','Drive Folder']);
-    }
-    // 2. Create employee folder in Google Drive (inside "DG Hotels Onboarding" folder)
-    var rootFolder=DriveApp.getRootFolder();
-    var parentFolderName='DG Hotels Onboarding';
-    var parentFolders=rootFolder.getFoldersByName(parentFolderName);
-    var parentFolder=parentFolders.hasNext()?parentFolders.next():rootFolder.createFolder(parentFolderName);
+    if(sheet.getLastRow()===0){sheet.appendRow(['Ref ID','Submitted','Name','Email','Phone','Location','TD1 Federal','TD1 Ontario','D1','D2','D3','D4','D5','D6','D7','D8','D9','Drive Folder']);}
+    // 2. Create employee folder inside "DG Hotels Onboarding"
+    var root=DriveApp.getRootFolder();
+    var pIter=root.getFoldersByName('DG Hotels Onboarding');
+    var parent=pIter.hasNext()?pIter.next():root.createFolder('DG Hotels Onboarding');
     var folderName=d.name+' – '+d.submittedAt.substring(0,10)+' – '+d.id;
-    var empFolder=parentFolder.createFolder(folderName);
-    // 3. Save each signature as a PNG
-    var sigLabels=['Employee Agreement','ESA Poster','TD1 Certification','Customer Service Standards','Customer Service Standard Policy','Accessible Workplace','Discrimination & Harassment','Fitness for Work','Workplace Health & Safety'];
-    if(d.signatures){for(var i=1;i<=9;i++){var sk='sig'+i;if(d.signatures[sk]){var b64=d.signatures[sk].replace('data:image/png;base64,','');var blob=Utilities.newBlob(Utilities.base64Decode(b64),'image/png','Signature – '+sigLabels[i-1]+'.png');empFolder.createFile(blob);}}}
-    // 4. Save uploaded files
+    var empFolder=parent.createFolder(folderName);
+    // 3. Save full signed package HTML (all documents + signatures + dates)
+    if(d.signedPackageHtml){
+      var htmlBytes=Utilities.base64Decode(d.signedPackageHtml);
+      var htmlBlob=Utilities.newBlob(htmlBytes,'text/html','Signed Onboarding Package – '+d.name+'.html');
+      empFolder.createFile(htmlBlob);
+    }
+    // 4. Save uploaded files (TD1s, work permit)
     if(d.files){
       if(d.files.td1Federal&&d.files.td1Federal.data){var b=d.files.td1Federal.data.split(',')[1];empFolder.createFile(Utilities.newBlob(Utilities.base64Decode(b),'application/pdf','TD1 Federal – '+d.name+'.pdf'));}
       if(d.files.td1Ontario&&d.files.td1Ontario.data){var b=d.files.td1Ontario.data.split(',')[1];empFolder.createFile(Utilities.newBlob(Utilities.base64Decode(b),'application/pdf','TD1 Ontario – '+d.name+'.pdf'));}
       if(d.files.workPermit&&d.files.workPermit.data){var b=d.files.workPermit.data.split(',')[1];var mt=d.files.workPermit.name.match(/\.pdf$/i)?'application/pdf':'image/jpeg';empFolder.createFile(Utilities.newBlob(Utilities.base64Decode(b),mt,'Work Permit – '+d.name+' – '+d.files.workPermit.name));}
     }
+    // 5. Log sheet row
     sheet.appendRow([d.id,d.submittedAt,d.name,d.email,d.phone,d.hotelLocation,d.td1Federal,d.td1Ontario,d.d1,d.d2,d.d3,d.d4,d.d5,d.d6,d.d7,d.d8,d.d9,empFolder.getUrl()]);
     return ContentService.createTextOutput(JSON.stringify({status:'ok',folder:folderName})).setMimeType(ContentService.MimeType.JSON);
   }catch(err){
@@ -1778,59 +1779,85 @@ function submitForm(){
   existing.push(record);
   localStorage.setItem('dg-hotels-onboarding',JSON.stringify(existing));
 
-  // Build email body
-  var docLines='';
-  for(var k=1;k<=9;k++){
-    docLines+='\n  '+(record.docs[k]?'✅':'❌')+' '+DOC_NAMES[k];
-  }
 
-  var emailSubject='New Employee Onboarding – '+record.name+' ('+record.id+')';
-  var emailBody=
-'New Employee Onboarding Submission\n'+
-'Reference: '+record.id+'\n'+
-'Submitted: '+record.submittedAt+'\n'+
-'\n━━━━━━━━━━━━━━━━━━━━━━━━\n'+
-'PERSONAL INFORMATION\n'+
-'━━━━━━━━━━━━━━━━━━━━━━━━\n'+
-'Name:          '+record.name+'\n'+
-'Email:         '+record.email+'\n'+
-'Phone:         '+record.phone+'\n'+
-'Location:      '+record.hotelLocation+'\n'+
-'Work Entitled: '+(document.getElementById('workEntitledCheck').checked?'Yes':'No')+'\n'+
-'Work Permit:   '+(document.getElementById('workPermitCheck').checked?'Yes – '+document.getElementById('permitNumber').value+' (Exp: '+document.getElementById('permitExpiry').value+')':'No')+'\n'+
-'Permit File:   '+(permitFile?permitFile.name:'N/A')+'\n'+
-'\n━━━━━━━━━━━━━━━━━━━━━━━━\n'+
-'BANKING INFORMATION\n'+
-'━━━━━━━━━━━━━━━━━━━━━━━━\n'+
-'Bank:          '+document.getElementById('bankName').value+'\n'+
-'Institution #: '+document.getElementById('institutionNo').value+'\n'+
-'Transit #:     '+document.getElementById('transitNo').value+'\n'+
-'Account #:     ****'+document.getElementById('accountNo').value.slice(-4)+'\n'+
-'Account Type:  '+document.getElementById('accountType').value+'\n'+
-'\n━━━━━━━━━━━━━━━━━━━━━━━━\n'+
-'TD1 FILES UPLOADED\n'+
-'━━━━━━━━━━━━━━━━━━━━━━━━\n'+
-'Federal TD1:   '+(td1Files.federal?td1Files.federal.name:'Not uploaded')+'\n'+
-'Ontario TD1ON: '+(td1Files.ontario?td1Files.ontario.name:'Not uploaded')+'\n'+
-'\n━━━━━━━━━━━━━━━━━━━━━━━━\n'+
-'DOCUMENT SIGNING STATUS\n'+
-'━━━━━━━━━━━━━━━━━━━━━━━━'+
-docLines+'\n'+
-'\n━━━━━━━━━━━━━━━━━━━━━━━━\n'+
-'All documents signed and submitted via the DG Hotels onboarding portal.\n'+
-'Please retain this email for your records.';
 
   // ---- GOOGLE SHEETS + DRIVE via Apps Script ----
   // URL is saved by admin via the Admin Portal input — no file editing needed
   var SHEETS_URL = localStorage.getItem('dg_apps_script_url') || '';
 
   if(SHEETS_URL){
-    // Collect all 9 signatures as PNG data URLs
+    // ── Collect signatures + dates ──────────────────────────────────────────
     var sigs = {};
+    var sigDates = {};
     for(var si=1;si<=9;si++){
       var c = document.getElementById('sig-'+si);
       if(c) sigs['sig'+si] = c.toDataURL('image/png');
+      var dp = document.getElementById('sig-datepicker-'+si);
+      sigDates['sig'+si] = dp ? dp.value : record.submittedAt.substring(0,10);
     }
+
+    // ── Build one self-contained "Signed Package" HTML per employee ─────────
+    var pkgCSS = 'body{font-family:Arial,sans-serif;color:#222;max-width:860px;margin:0 auto;padding:30px}'+
+      'h1{color:#2D3280;font-size:1.3rem;margin-bottom:4px}'+
+      '.meta{color:#555;font-size:.85rem;margin-bottom:30px}'+
+      '.doc-block{border:1px solid #ddd;border-radius:8px;margin-bottom:28px;overflow:hidden}'+
+      '.doc-block-header{background:#2D3280;color:#fff;padding:10px 16px;font-weight:700;font-size:.95rem}'+
+      '.doc-block-body{padding:16px;font-size:.85rem;line-height:1.6}'+
+      '.doc-block-body h3{color:#2D3280;font-size:.9rem;margin:14px 0 4px}'+
+      '.sig-box{background:#fff5e6;border:2px solid #F7941D;border-radius:6px;padding:14px;margin-top:14px}'+
+      '.sig-box p{margin:4px 0;font-size:.82rem;color:#555}'+
+      '.sig-box img{display:block;max-width:380px;border:1px solid #ccc;border-radius:4px;margin-top:8px}'+
+      '.sig-meta{margin-top:8px;font-size:.82rem;color:#333;font-weight:600}';
+
+    var pkgHeader = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Signed Onboarding Package – '+record.name+'</title>'+
+      '<style>'+pkgCSS+'</style></head><body>'+
+      '<h1>Comfort Inn &amp; Suites Bradford — DG Hotels</h1>'+
+      '<div class="meta">'+
+        'Employee Onboarding — Signed Document Package<br>'+
+        'Employee: <strong>'+record.name+'</strong> | Email: '+record.email+' | Phone: '+record.phone+'<br>'+
+        'Submitted: '+record.submittedAt+' | Reference: '+record.id+
+      '</div>';
+
+    var pkgBody = '';
+    for(var di=1;di<=9;di++){
+      var card = document.getElementById('doc-card-'+di);
+      var docText = '';
+      if(card){
+        // Grab all text from sections inside the card (excluding the sig-section controls)
+        var sections = card.querySelectorAll('.section');
+        sections.forEach(function(sec){
+          var h = sec.querySelector('h3');
+          var ps = sec.querySelectorAll('p');
+          if(h) docText += '<h3>'+h.innerHTML+'</h3>';
+          ps.forEach(function(p){ docText += '<p>'+p.innerHTML+'</p>'; });
+        });
+        // If no .section divs, try to grab any paragraphs in the doc content
+        if(!docText){
+          var allP = card.querySelectorAll('.doc-body p, .doc-content p');
+          allP.forEach(function(p){ docText += '<p>'+p.innerHTML+'</p>'; });
+        }
+      }
+      var sigImg = sigs['sig'+di] ? '<img src="'+sigs['sig'+di]+'" alt="Signature">' : '<p><em>No signature captured.</em></p>';
+      var dateStr = sigDates['sig'+di] ? new Date(sigDates['sig'+di]+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}) : 'N/A';
+      pkgBody +=
+        '<div class="doc-block">'+
+          '<div class="doc-block-header">'+di+'. '+DOC_NAMES[di]+'</div>'+
+          '<div class="doc-block-body">'+
+            (docText || '<p><em>See the original policy document.</em></p>')+
+            '<div class="sig-box">'+
+              '<p><strong>Employee Signature:</strong></p>'+
+              sigImg+
+              '<p class="sig-meta">Date Signed: '+dateStr+'</p>'+
+              '<p class="sig-meta">Employee: '+record.name+' | Ref: '+record.id+'</p>'+
+            '</div>'+
+          '</div>'+
+        '</div>';
+    }
+    var pkgHtml = pkgHeader + pkgBody + '</body></html>';
+
+    // base64-encode the package HTML (handles Unicode safely)
+    var pkgB64 = btoa(unescape(encodeURIComponent(pkgHtml)));
+
     var sheetsData = {
       id: record.id,
       submittedAt: record.submittedAt,
@@ -1849,8 +1876,10 @@ docLines+'\n'+
       d7: record.docs[7]?'Signed':'Unsigned',
       d8: record.docs[8]?'Signed':'Unsigned',
       d9: record.docs[9]?'Signed':'Unsigned',
-      // Signature images (base64 PNG) — saved as files in Google Drive
-      signatures: sigs,
+      // Signature dates
+      signatureDates: sigDates,
+      // Full signed package HTML (one file with all documents + signatures + dates)
+      signedPackageHtml: pkgB64,
       // Uploaded file data — saved as files in Google Drive
       files: {
         td1Federal:  td1Files.federal  ? {name: td1Files.federal.name,  data: td1Files.federal.data}  : null,
@@ -1865,14 +1894,6 @@ docLines+'\n'+
       body:JSON.stringify(sheetsData)
     }).catch(function(err){ console.warn('Sheets sync failed:',err); });
   }
-
-  // ---- EMAIL via mailto ----
-  var mailtoLink='mailto:cnb27@stayatchoice.com'+
-    '?subject='+encodeURIComponent(emailSubject)+
-    '&body='+encodeURIComponent(emailBody);
-
-  // Open email after short delay (so Sheets fetch can start)
-  setTimeout(function(){ window.location.href=mailtoLink; }, 400);
 
   document.getElementById('success-ref').textContent=record.id;
   document.getElementById('successModal').classList.add('show');
