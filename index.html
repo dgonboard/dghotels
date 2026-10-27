@@ -348,6 +348,7 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
   .inline-field-row{flex-direction:column;align-items:flex-start}
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -1332,11 +1333,11 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
     var parent=pIter.hasNext()?pIter.next():root.createFolder('DG Hotels Onboarding');
     var folderName=d.name+' – '+d.submittedAt.substring(0,10)+' – '+d.id;
     var empFolder=parent.createFolder(folderName);
-    // 3. Save full signed package HTML (all documents + signatures + dates)
-    if(d.signedPackageHtml){
-      var htmlBytes=Utilities.base64Decode(d.signedPackageHtml);
-      var htmlBlob=Utilities.newBlob(htmlBytes,'text/html','Signed Onboarding Package – '+d.name+'.html');
-      empFolder.createFile(htmlBlob);
+    // 3. Save signed package PDF (all documents + signatures + dates — opens natively in Drive)
+    if(d.signedPackagePdf){
+      var pdfBytes=Utilities.base64Decode(d.signedPackagePdf);
+      var pdfBlob=Utilities.newBlob(pdfBytes,'application/pdf','Signed Onboarding Package – '+d.name+'.pdf');
+      empFolder.createFile(pdfBlob);
     }
     // 4. Save uploaded files (TD1s, work permit)
     if(d.files){
@@ -1796,67 +1797,122 @@ function submitForm(){
       sigDates['sig'+si] = dp ? dp.value : record.submittedAt.substring(0,10);
     }
 
-    // ── Build one self-contained "Signed Package" HTML per employee ─────────
-    var pkgCSS = 'body{font-family:Arial,sans-serif;color:#222;max-width:860px;margin:0 auto;padding:30px}'+
-      'h1{color:#2D3280;font-size:1.3rem;margin-bottom:4px}'+
-      '.meta{color:#555;font-size:.85rem;margin-bottom:30px}'+
-      '.doc-block{border:1px solid #ddd;border-radius:8px;margin-bottom:28px;overflow:hidden}'+
-      '.doc-block-header{background:#2D3280;color:#fff;padding:10px 16px;font-weight:700;font-size:.95rem}'+
-      '.doc-block-body{padding:16px;font-size:.85rem;line-height:1.6}'+
-      '.doc-block-body h3{color:#2D3280;font-size:.9rem;margin:14px 0 4px}'+
-      '.sig-box{background:#fff5e6;border:2px solid #F7941D;border-radius:6px;padding:14px;margin-top:14px}'+
-      '.sig-box p{margin:4px 0;font-size:.82rem;color:#555}'+
-      '.sig-box img{display:block;max-width:380px;border:1px solid #ccc;border-radius:4px;margin-top:8px}'+
-      '.sig-meta{margin-top:8px;font-size:.82rem;color:#333;font-weight:600}';
+    // ── Build signed package as a proper PDF (opens natively in Google Drive) ─
+    var pdfB64 = (function(){
+      try {
+        var jsPDF = window.jspdf ? window.jspdf.jsPDF : null;
+        if(!jsPDF) return null;
 
-    var pkgHeader = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Signed Onboarding Package – '+record.name+'</title>'+
-      '<style>'+pkgCSS+'</style></head><body>'+
-      '<h1>Comfort Inn &amp; Suites Bradford — DG Hotels</h1>'+
-      '<div class="meta">'+
-        'Employee Onboarding — Signed Document Package<br>'+
-        'Employee: <strong>'+record.name+'</strong> | Email: '+record.email+' | Phone: '+record.phone+'<br>'+
-        'Submitted: '+record.submittedAt+' | Reference: '+record.id+
-      '</div>';
+        var doc = new jsPDF({unit:'mm', format:'letter', orientation:'portrait'});
+        var pw = doc.internal.pageSize.getWidth();
+        var ph = doc.internal.pageSize.getHeight();
+        var ml = 18, cw = pw - ml*2;
 
-    var pkgBody = '';
-    for(var di=1;di<=9;di++){
-      var card = document.getElementById('doc-card-'+di);
-      var docText = '';
-      if(card){
-        // Grab all text from sections inside the card (excluding the sig-section controls)
-        var sections = card.querySelectorAll('.section');
-        sections.forEach(function(sec){
-          var h = sec.querySelector('h3');
-          var ps = sec.querySelectorAll('p');
-          if(h) docText += '<h3>'+h.innerHTML+'</h3>';
-          ps.forEach(function(p){ docText += '<p>'+p.innerHTML+'</p>'; });
-        });
-        // If no .section divs, try to grab any paragraphs in the doc content
-        if(!docText){
-          var allP = card.querySelectorAll('.doc-body p, .doc-content p');
-          allP.forEach(function(p){ docText += '<p>'+p.innerHTML+'</p>'; });
+        function navyBar(d, rightLabel){
+          d.setFillColor(45,50,128);
+          d.rect(0,0,pw,14,'F');
+          d.setFontSize(9); d.setTextColor(255,255,255);
+          d.text('Comfort Inn & Suites Bradford — DG Hotels', ml, 9.5);
+          if(rightLabel) d.text(rightLabel, pw-ml, 9.5, {align:'right'});
         }
-      }
-      var sigImg = sigs['sig'+di] ? '<img src="'+sigs['sig'+di]+'" alt="Signature">' : '<p><em>No signature captured.</em></p>';
-      var dateStr = sigDates['sig'+di] ? new Date(sigDates['sig'+di]+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}) : 'N/A';
-      pkgBody +=
-        '<div class="doc-block">'+
-          '<div class="doc-block-header">'+di+'. '+DOC_NAMES[di]+'</div>'+
-          '<div class="doc-block-body">'+
-            (docText || '<p><em>See the original policy document.</em></p>')+
-            '<div class="sig-box">'+
-              '<p><strong>Employee Signature:</strong></p>'+
-              sigImg+
-              '<p class="sig-meta">Date Signed: '+dateStr+'</p>'+
-              '<p class="sig-meta">Employee: '+record.name+' | Ref: '+record.id+'</p>'+
-            '</div>'+
-          '</div>'+
-        '</div>';
-    }
-    var pkgHtml = pkgHeader + pkgBody + '</body></html>';
+        function footer(d, n){
+          d.setFontSize(7.5); d.setTextColor(150,150,150);
+          d.text('DG Hotels Onboarding | Ref: '+record.id+' | Page '+n, pw/2, ph-6, {align:'center'});
+        }
 
-    // base64-encode the package HTML (handles Unicode safely)
-    var pkgB64 = btoa(unescape(encodeURIComponent(pkgHtml)));
+        // ── Cover page ──────────────────────────────────────────────────────
+        navyBar(doc, 'Signed Document Package');
+        var y=26;
+        doc.setFontSize(17); doc.setTextColor(45,50,128);
+        doc.text('Employee Onboarding', pw/2, y, {align:'center'});
+        doc.text('Signed Document Package', pw/2, y+9, {align:'center'});
+        y+=24;
+        doc.setFontSize(10); doc.setTextColor(60,60,60);
+        [['Employee:', record.name],['Email:', record.email],['Phone:', record.phone],
+         ['Submitted:', record.submittedAt],['Reference:', record.id]
+        ].forEach(function(row){
+          doc.setFont(undefined,'bold'); doc.text(row[0], ml, y);
+          doc.setFont(undefined,'normal'); doc.text(row[1]||'', ml+28, y);
+          y+=7;
+        });
+        y+=6;
+        doc.setFontSize(11); doc.setFont(undefined,'bold'); doc.setTextColor(45,50,128);
+        doc.text('Document Signing Summary', ml, y); y+=8;
+        for(var di=1;di<=9;di++){
+          var ds = sigDates['sig'+di] ? new Date(sigDates['sig'+di]+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}) : 'N/A';
+          doc.setFontSize(9); doc.setFont(undefined,'normal'); doc.setTextColor(50,50,50);
+          doc.text(di+'. '+DOC_NAMES[di], ml, y);
+          doc.text('Signed: '+ds, pw-ml, y, {align:'right'});
+          y+=6.5;
+        }
+        footer(doc,1);
+
+        // ── One page per signed document ────────────────────────────────────
+        for(var di=1;di<=9;di++){
+          doc.addPage();
+          var title = di+'. '+DOC_NAMES[di];
+          navyBar(doc, title);
+          y=22;
+
+          doc.setFontSize(12); doc.setFont(undefined,'bold'); doc.setTextColor(45,50,128);
+          doc.text(title, ml, y); y+=9;
+
+          // Extract plain text from document card
+          var card = document.getElementById('doc-card-'+di);
+          var txt = '';
+          if(card){
+            card.querySelectorAll('.section').forEach(function(sec){
+              var h=sec.querySelector('h3');
+              if(h) txt += '■ '+h.textContent.trim()+'\n';
+              sec.querySelectorAll('p').forEach(function(p){
+                var t=p.textContent.trim(); if(t) txt+=t+'\n\n';
+              });
+            });
+            if(!txt){
+              card.querySelectorAll('p').forEach(function(p){
+                var sigSec=p.closest('.sig-section');
+                if(!sigSec){ var t=p.textContent.trim(); if(t) txt+=t+'\n\n'; }
+              });
+            }
+          }
+
+          // Write body text, stop before signature box
+          var sigBoxH=52, sigBoxY=ph-sigBoxH-12;
+          doc.setFontSize(8.5); doc.setFont(undefined,'normal'); doc.setTextColor(40,40,40);
+          var lh=4.3;
+          if(txt.trim()){
+            var lines=doc.splitTextToSize(txt.trim(), cw);
+            for(var li=0;li<lines.length;li++){
+              if(y+lh>sigBoxY-2) break;
+              doc.text(lines[li], ml, y); y+=lh;
+            }
+          }
+
+          // Signature box
+          doc.setFillColor(255,245,230); doc.setDrawColor(247,148,29); doc.setLineWidth(0.6);
+          doc.roundedRect(ml, sigBoxY, cw, sigBoxH, 3, 3, 'FD');
+          doc.setFontSize(8.5); doc.setFont(undefined,'bold'); doc.setTextColor(80,80,80);
+          doc.text('Employee Signature:', ml+4, sigBoxY+8);
+          // Signature image
+          if(sigs['sig'+di]){
+            try{ doc.addImage(sigs['sig'+di],'PNG', ml+4, sigBoxY+10, 88, 22); }catch(e){}
+          }
+          // Date + employee info
+          var ds2 = sigDates['sig'+di] ? new Date(sigDates['sig'+di]+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}) : 'N/A';
+          doc.setFontSize(9); doc.setFont(undefined,'bold'); doc.setTextColor(40,40,40);
+          doc.text('Date Signed: '+ds2, ml+4, sigBoxY+37);
+          doc.setFont(undefined,'normal'); doc.setFontSize(8.5);
+          doc.text('Employee: '+record.name+'   |   Reference: '+record.id, ml+4, sigBoxY+43);
+
+          footer(doc, di+1);
+        }
+
+        return doc.output('datauristring').split(',')[1];
+      } catch(pdfErr){
+        console.warn('PDF generation failed:', pdfErr);
+        return null;
+      }
+    })();
 
     var sheetsData = {
       id: record.id,
@@ -1876,11 +1932,10 @@ function submitForm(){
       d7: record.docs[7]?'Signed':'Unsigned',
       d8: record.docs[8]?'Signed':'Unsigned',
       d9: record.docs[9]?'Signed':'Unsigned',
-      // Signature dates
       signatureDates: sigDates,
-      // Full signed package HTML (one file with all documents + signatures + dates)
-      signedPackageHtml: pkgB64,
-      // Uploaded file data — saved as files in Google Drive
+      // Signed package as PDF — opens natively in Google Drive
+      signedPackagePdf: pdfB64,
+      // Uploaded file data
       files: {
         td1Federal:  td1Files.federal  ? {name: td1Files.federal.name,  data: td1Files.federal.data}  : null,
         td1Ontario:  td1Files.ontario  ? {name: td1Files.ontario.name,  data: td1Files.ontario.data}  : null,
