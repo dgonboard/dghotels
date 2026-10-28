@@ -1859,21 +1859,37 @@ function submitForm(){
           doc.setFontSize(12); doc.setFont(undefined,'bold'); doc.setTextColor(45,50,128);
           doc.text(title, ml, y); y+=9;
 
-          // Extract plain text from document card
+          // Extract plain text from document card (captures p, ul/li, ol/li)
           var card = document.getElementById('doc-card-'+di);
           var txt = '';
           if(card){
             card.querySelectorAll('.section').forEach(function(sec){
               var h=sec.querySelector('h3');
-              if(h) txt += '■ '+h.textContent.trim()+'\n';
-              sec.querySelectorAll('p').forEach(function(p){
-                var t=p.textContent.trim(); if(t) txt+=t+'\n\n';
+              if(h) txt += h.textContent.trim()+'\n';
+              // Walk direct children so we get p, ul, ol in document order
+              Array.from(sec.children).forEach(function(el){
+                if(el.tagName==='H3') return; // already handled
+                if(el.tagName==='P'){
+                  var t=el.textContent.trim(); if(t) txt+=t+'\n\n';
+                } else if(el.tagName==='UL'||el.tagName==='OL'){
+                  el.querySelectorAll('li').forEach(function(li){
+                    var t=li.textContent.trim(); if(t) txt+='  - '+t+'\n';
+                  });
+                  txt+='\n';
+                }
               });
             });
+            // Fallback: grab all content not in sig-section
             if(!txt){
-              card.querySelectorAll('p').forEach(function(p){
-                var sigSec=p.closest('.sig-section');
-                if(!sigSec){ var t=p.textContent.trim(); if(t) txt+=t+'\n\n'; }
+              card.querySelectorAll('.doc-body *').forEach(function(el){
+                if(el.closest('.sig-section')) return;
+                if(el.tagName==='H2'||el.tagName==='H3'){
+                  var t=el.textContent.trim(); if(t) txt+=t+'\n';
+                } else if(el.tagName==='P'){
+                  var t=el.textContent.trim(); if(t) txt+=t+'\n\n';
+                } else if(el.tagName==='LI'){
+                  var t=el.textContent.trim(); if(t) txt+='  - '+t+'\n';
+                }
               });
             }
           }
@@ -1920,8 +1936,9 @@ function submitForm(){
     var fallbackHtml = null;
     if(!pdfB64){
       var fCss='body{font-family:Arial,sans-serif;color:#222;max-width:860px;margin:0 auto;padding:30px}'+
-        'h1{color:#2D3280}h2{color:#2D3280;font-size:1rem;background:#eaebf7;padding:8px 12px;border-radius:4px}'+
-        'h3{color:#2D3280;font-size:.9rem}p{font-size:.85rem;line-height:1.6;margin:.4em 0}'+
+        'h1{color:#2D3280}h2{color:#2D3280;font-size:1rem;background:#eaebf7;padding:8px 12px;border-radius:4px;font-weight:700}'+
+        'h3{color:#2D3280;font-size:.9rem;font-weight:700;margin:12px 0 4px}p{font-size:.85rem;line-height:1.6;margin:.4em 0}'+
+        'ul,ol{font-size:.85rem;line-height:1.7;padding-left:20px}li{margin:.2em 0}'+
         '.sig-box{background:#fff5e6;border:2px solid #F7941D;border-radius:6px;padding:14px;margin-top:12px}'+
         'img{display:block;max-width:380px;border:1px solid #ccc;border-radius:4px;margin:8px 0}'+
         '.meta{color:#555;font-size:.85rem;margin-bottom:24px}';
@@ -1937,11 +1954,26 @@ function submitForm(){
         if(fCard){
           fCard.querySelectorAll('.section').forEach(function(sec){
             var h=sec.querySelector('h3');
-            if(h) fTxt+='<h3>'+h.innerHTML+'</h3>';
-            sec.querySelectorAll('p').forEach(function(p){fTxt+='<p>'+p.innerHTML+'</p>';});
+            if(h) fTxt+='<h3>'+h.textContent.trim()+'</h3>';
+            Array.from(sec.children).forEach(function(el){
+              if(el.tagName==='H3') return;
+              if(el.tagName==='P'){ fTxt+='<p>'+el.innerHTML+'</p>'; }
+              else if(el.tagName==='UL'||el.tagName==='OL'){
+                fTxt+='<'+el.tagName.toLowerCase()+'>';
+                el.querySelectorAll('li').forEach(function(li){ fTxt+='<li>'+li.innerHTML+'</li>'; });
+                fTxt+='</'+el.tagName.toLowerCase()+'>';
+              }
+            });
           });
-          if(!fTxt) fCard.querySelectorAll('p').forEach(function(p){
-            if(!p.closest('.sig-section')) fTxt+='<p>'+p.innerHTML+'</p>';
+          if(!fTxt) fCard.querySelectorAll('.doc-body *').forEach(function(el){
+            if(el.closest('.sig-section')) return;
+            if(el.tagName==='H2'||el.tagName==='H3') fTxt+='<h3>'+el.textContent.trim()+'</h3>';
+            else if(el.tagName==='P') fTxt+='<p>'+el.innerHTML+'</p>';
+            else if(el.tagName==='UL'||el.tagName==='OL'){
+              fTxt+='<'+el.tagName.toLowerCase()+'>';
+              el.querySelectorAll('li').forEach(function(li){ fTxt+='<li>'+li.innerHTML+'</li>'; });
+              fTxt+='</'+el.tagName.toLowerCase()+'>';
+            }
           });
         }
         var fDs=sigDates['sig'+fi]?new Date(sigDates['sig'+fi]+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}):'N/A';
