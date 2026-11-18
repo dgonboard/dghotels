@@ -418,8 +418,8 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
         <span class="field-error" id="err-email">Please enter a valid email.</span>
       </div>
       <div class="form-group">
-        <label for="dob">Date of Birth (DD/MM/YYYY) *</label>
-        <input type="text" id="dob" placeholder="DD/MM/YYYY" maxlength="10">
+        <label for="dob">Date of Birth *</label>
+        <input type="date" id="dob" min="1930-01-01" style="min-height:48px">
         <span class="field-error" id="err-dob">Please enter your date of birth.</span>
       </div>
     </div>
@@ -573,6 +573,14 @@ input.invalid,select.invalid{border-color:var(--danger) !important}
           <option value="Savings">Savings</option>
         </select>
       </div>
+    </div>
+
+    <div class="form-group" style="margin-top:6px">
+      <label for="voidChequeUpload">Upload Void Cheque or Direct Deposit Slip (PDF or photo) *</label>
+      <input type="file" id="voidChequeUpload" accept=".pdf,.jpg,.jpeg,.png" onchange="handleVoidChequeUpload(this)"
+        style="font-size:15px;padding:8px;border:1.5px dashed #aaa;border-radius:8px;background:#fafafa;min-height:48px;cursor:pointer;width:100%">
+      <span class="hint" id="voidcheque-upload-status">Upload a clear photo or scan of a void cheque or direct deposit slip.</span>
+      <span class="field-error" id="err-voidCheque">Please upload your void cheque or direct deposit slip.</span>
     </div>
 
     <!-- VOID CHEQUE DIAGRAM -->
@@ -1340,13 +1348,41 @@ function doPost(e){
     var f=getEmpFolder(d);
     var empFolder=f.folder;
 
-    // A) One uploaded file sent on its own (keeps every request small)
+    // A) One uploaded file (sent in small pieces so no request is too big)
     if(d.fileOnly){
-      var labels={td1Federal:'TD1 Federal',td1Ontario:'TD1 Ontario',workPermit:'Work Permit'};
+      var labels={td1Federal:'TD1 Federal',td1Ontario:'TD1 Ontario',workPermit:'Work Permit',voidCheque:'Void Cheque'};
       var label=labels[d.fileKey]||d.fileKey;
-      var nm=label+' – '+d.name+(d.fileKey==='workPermit'?' – '+d.fileName:'.pdf');
-      saveFileFromData(empFolder,d.data,nm,'image/jpeg');
+      var withName=(d.fileKey==='workPermit'||d.fileKey==='voidCheque');
+      var nm=label+' – '+d.name+(withName?' – '+d.fileName:'.pdf');
+      var total=d.chunkTotal||1, idx=d.chunkIndex||0;
+      if(total>1){
+        var pad=function(n){return ('0000'+n).slice(-4);};
+        empFolder.createFile('__part_'+d.fileKey+'_'+pad(idx), d.data, MimeType.PLAIN_TEXT);
+        if(idx===total-1){
+          var all='';
+          for(var i=0;i<total;i++){
+            var pit=empFolder.getFilesByName('__part_'+d.fileKey+'_'+pad(i));
+            var first=true;
+            while(pit.hasNext()){ var pf=pit.next(); if(first){ all+=pf.getBlob().getDataAsString(); first=false; } pf.setTrashed(true); }
+          }
+          saveFileFromData(empFolder,all,nm,'image/jpeg');
+        }
+      } else {
+        saveFileFromData(empFolder,d.data,nm,'image/jpeg');
+      }
       return ContentService.createTextOutput(JSON.stringify({status:'ok',file:nm})).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // A2) Final step: email everything in the employee's Drive folder
+    if(d.finalize){
+      var files=[], total=0, links=[], it2=empFolder.getFiles();
+      while(it2.hasNext()){ var fl=it2.next(); links.push(fl.getName()+': '+fl.getUrl()); total+=fl.getSize(); files.push(fl); }
+      var body='New onboarding submission\n\nName: '+d.name+'\nReference: '+d.id+'\nSubmitted: '+d.submittedAt+'\nDrive folder: '+empFolder.getUrl()+'\n\nFiles saved ('+files.length+'):\n'+links.join('\n');
+      var opts={name:'DG Hotels Onboarding'};
+      if(total<20*1024*1024){ opts.attachments=files.map(function(x){return x.getBlob();}); }
+      else { body+='\n\n(Files were too large to attach - use the Drive links above.)'; }
+      MailApp.sendEmail('upreet@dhanoagroup.com','Onboarding submission - '+d.name+' ('+d.id+')',body,opts);
+      return ContentService.createTextOutput(JSON.stringify({status:'ok',emailed:files.length})).setMimeType(ContentService.MimeType.JSON);
     }
 
     // B) Main submission: sheet row + signed package
@@ -1512,10 +1548,14 @@ function validateStep2(){
   req('institutionNo','err-institutionNo',function(e){ return /^\d{3}$/.test(e.value.trim()); });
   req('transitNo','err-transitNo',function(e){ return /^\d{5}$/.test(e.value.trim()); });
   req('accountNo','err-accountNo',function(e){ return e.value.trim().length>4; });
+  var vcErr = document.getElementById('err-voidCheque');
+  if(!voidChequeFile){ if(vcErr) vcErr.classList.add('show'); ok=false; } else { if(vcErr) vcErr.classList.remove('show'); }
   return ok;
 }
 
 // ---- SIN TOGGLE ----
+(function(){ var el=document.getElementById('dob'); if(el){ el.max=new Date().toISOString().split('T')[0]; } })();
+
 function toggleSin(){
   var inp = document.getElementById('sin');
   inp.type = inp.type === 'password' ? 'text' : 'password';
@@ -1536,6 +1576,44 @@ function toggleWorkEntitled(){
 function toggleWorkPermit(){
   var block = document.getElementById('workPermitBlock');
   block.classList.toggle('show', document.getElementById('workPermitCheck').checked);
+}
+
+// ---- VOID CHEQUE FILE UPLOAD ----
+var voidChequeFile = null;
+function handleVoidChequeUpload(input){
+  var file = input.files[0];
+  var status = document.getElementById('voidcheque-upload-status');
+  var err = document.getElementById('err-voidCheque');
+  voidChequeFile = null;
+  if(!file) return;
+  if(file.size > 10 * 1024 * 1024){
+    status.textContent = '⚠️ File too large (max 10MB).';
+    status.style.color = 'var(--danger)';
+    input.value = '';
+    return;
+  }
+  function done(name, data){
+    voidChequeFile = {name: name, data: data};
+    status.textContent = '✅ ' + file.name + ' — uploaded';
+    status.style.color = 'var(--success)';
+    if(err) err.classList.remove('show');
+  }
+  if(/^image\//i.test(file.type)){
+    var img = new Image(), u = URL.createObjectURL(file);
+    img.onload = function(){
+      var sc = Math.min(1, 1800/Math.max(img.width,img.height));
+      var cv = document.createElement('canvas'); cv.width = Math.round(img.width*sc); cv.height = Math.round(img.height*sc);
+      var cx = cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,cv.width,cv.height); cx.drawImage(img,0,0,cv.width,cv.height);
+      var du = cv.toDataURL('image/jpeg',0.75); URL.revokeObjectURL(u);
+      done(file.name.replace(/\.[^.]+$/,'')+'.jpg', du);
+    };
+    img.onerror = function(){ URL.revokeObjectURL(u); status.textContent='⚠️ Could not read that image. Please try another file.'; status.style.color='var(--danger)'; };
+    img.src = u;
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e){ done(file.name, e.target.result); };
+  reader.readAsDataURL(file);
 }
 
 // ---- PERMIT FILE UPLOAD ----
@@ -1734,7 +1812,7 @@ function populateReview(){
     ['Full Name',document.getElementById('fullName').value],
     ['Email',document.getElementById('email').value],
     ['Phone',document.getElementById('phone').value],
-    ['Date of Birth',document.getElementById('dob').value],
+    ['Date of Birth',(function(v){var p=(v||'').split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:v;})(document.getElementById('dob').value)],
     ['Address',document.getElementById('address').value+', '+document.getElementById('city').value+', '+document.getElementById('province').value+' '+document.getElementById('postal').value],
     ['SIN',mask(sin,3)],
     ['Hotel Location',document.getElementById('hotelLocation').value],
@@ -1753,6 +1831,7 @@ function populateReview(){
     ['Transit #',document.getElementById('transitNo').value],
     ['Account #',mask(acct,4)],
     ['Account Type',document.getElementById('accountType').value],
+    ['Void Cheque File',voidChequeFile?voidChequeFile.name:'Not uploaded'],
   ];
   b.innerHTML=bitems.map(function(it){
     return '<div class="review-item"><div class="lbl">'+it[0]+'</div><div class="val">'+it[1]+'</div></div>';
@@ -1788,6 +1867,7 @@ function submitForm(){
   if(!/^\d{3}$/.test(document.getElementById('institutionNo').value.trim())) errors.push('3-digit institution number (Step 2)');
   if(!/^\d{5}$/.test(document.getElementById('transitNo').value.trim())) errors.push('5-digit transit number (Step 2)');
   if(!document.getElementById('accountNo').value.trim()) errors.push('Account number (Step 2)');
+  if(!voidChequeFile) errors.push('Void cheque upload (Step 2)');
 
   // Check all 9 docs signed
   var unsignedDocs = [];
@@ -2061,26 +2141,39 @@ function submitForm(){
     }
 
     var fileJobs = [];
+    if(voidChequeFile)   fileJobs.push({key:'voidCheque', name:voidChequeFile.name, data:voidChequeFile.data});
     if(td1Files.federal) fileJobs.push({key:'td1Federal', name:td1Files.federal.name, data:td1Files.federal.data});
     if(td1Files.ontario) fileJobs.push({key:'td1Ontario', name:td1Files.ontario.name, data:td1Files.ontario.data});
     if(permitFile)       fileJobs.push({key:'workPermit', name:permitFile.name,       data:permitFile.data});
 
-    // Main submission first (creates the Drive folder, logs the sheet row, saves the signed package),
-    // then each uploaded file one at a time so they can't be lost together.
-    (async function(){
-      try { await postToDrive(sheetsData); } catch(err){ console.warn('Sheets sync failed:',err); }
-      for(var fj=0; fj<fileJobs.length; fj++){
-        var job = fileJobs[fj];
-        for(var attempt=0; attempt<2; attempt++){
+    // Each file is cut into small pieces (~0.9 MB) and sent one piece at a time, so no single request is too big.
+    async function sendFileInChunks(job){
+      var b64 = job.data.indexOf(',')>-1 ? job.data.split(',')[1] : job.data;
+      var CH = 900000;
+      var total = Math.max(1, Math.ceil(b64.length/CH));
+      for(var ci=0; ci<total; ci++){
+        var sent = false;
+        for(var attempt=0; attempt<3 && !sent; attempt++){
           try {
             await postToDrive({
               fileOnly:true, id:record.id, name:record.name, submittedAt:record.submittedAt,
-              fileKey:job.key, fileName:job.name, data:job.data
+              fileKey:job.key, fileName:job.name,
+              chunkIndex:ci, chunkTotal:total, data:b64.substr(ci*CH, CH)
             });
-            break;
-          } catch(err){ console.warn('File upload failed ('+job.key+'), attempt '+(attempt+1)+':',err); }
+            sent = true;
+          } catch(err){ console.warn('Upload piece failed ('+job.key+' '+(ci+1)+'/'+total+'), attempt '+(attempt+1)+':',err); }
         }
       }
+    }
+
+    // Main submission first (creates the Drive folder, logs the sheet row, saves the signed package),
+    // then each uploaded file, then a final email to the office.
+    (async function(){
+      try { await postToDrive(sheetsData); } catch(err){ console.warn('Sheets sync failed:',err); }
+      for(var fj=0; fj<fileJobs.length; fj++){ await sendFileInChunks(fileJobs[fj]); }
+      try {
+        await postToDrive({ finalize:true, id:record.id, name:record.name, submittedAt:record.submittedAt });
+      } catch(err){ console.warn('Email step failed:',err); }
     })();
   }
 
